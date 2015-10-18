@@ -45,6 +45,7 @@
     <Compile Include="Perceptron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Connections\WeightedConnection.cs" />
+    <Compile Include="TransferFunctions\SigmoidFunction.cs" />
     <Compile Include="TransferFunctions\TransferFunction.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

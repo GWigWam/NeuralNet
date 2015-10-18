@@ -8,8 +8,8 @@ namespace NeuralNet.TransferFunctions {
 
     internal abstract class TransferFunction {
 
-        public void Calculate(params float[] input) => Calculate((IEnumerable<float>)input);
+        public float Calculate(params float[] input) => Calculate((IEnumerable<float>)input);
 
-        public abstract void Calculate(IEnumerable<float> input);
+        public abstract float Calculate(IEnumerable<float> input);
     }
 }
