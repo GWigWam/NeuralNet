@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.Connections {
 
-    internal class WeightedConnection : Connection {
+    public class WeightedConnection : Connection {
 
         public float Weight {
             get; set;
@@ -23,6 +23,7 @@ namespace NeuralNet.Connections {
                 throw new ArgumentException($"{nameof(getInput)} must not be null", nameof(getInput));
             }
             GetInput = getInput;
+            Weight = weight;
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.TransferFunctions {
 
-    internal abstract class TransferFunction {
+    public abstract class TransferFunction {
 
         public float Calculate(params float[] input) => Calculate((IEnumerable<float>)input);
 

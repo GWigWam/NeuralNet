@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.Connections {
 
-    internal interface Connection {
+    public interface Connection {
 
         float Output {
             get;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.TransferFunctions {
 
-    internal class SigmoidFunction : TransferFunction {
+    public class SigmoidFunction : TransferFunction {
 
         public override float Calculate(IEnumerable<float> input) {
             var val = Sigmoid(input.Sum());

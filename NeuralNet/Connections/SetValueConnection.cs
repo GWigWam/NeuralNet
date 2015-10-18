@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.Connections {
 
-    internal class SetValueConnection : Connection {
+    public class SetValueConnection : Connection {
 
         public float Value {
             get; set;
