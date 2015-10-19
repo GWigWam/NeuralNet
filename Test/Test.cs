@@ -39,13 +39,15 @@ namespace Test {
 
         [TestMethod]
         public void TestBasicPerceptron() {
+            string name = "TestName123";
             List<Connection> connections = new List<Connection>() {
                 new SetValueConnection(10),
                 new SetValueConnection(20)
             };
 
-            var p = new Perceptron(new SigmoidFunction(), connections);
+            var p = new Perceptron(new SigmoidFunction(), connections, name);
             Assert.IsTrue(p.Output > 0.9);
+            Assert.AreEqual(name, p.Name);
         }
 
         [TestMethod]
@@ -85,6 +87,33 @@ namespace Test {
 
             Assert.IsTrue(nw.Perceptrons[3][0].Connections.Length == layer2);
             Assert.IsTrue(nw.Perceptrons[2][3].Connections.Length == layer1);
+        }
+
+        [TestMethod]
+        public void TestNetworkOutput() {
+            var rand = new Random();
+            float input = (float)(rand.NextDouble() * 100);
+            float weight = (float)(rand.NextDouble() * 2);
+
+            var sigmoid = new SigmoidFunction();
+            var nw = new Network(sigmoid);
+
+            var inputCon = new SetValueConnection(input);
+            var inputNode = new Perceptron(sigmoid, inputCon, "Input");
+            var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
+            var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
+
+            nw.Perceptrons = new Perceptron[][] {
+                new Perceptron[] { inputNode },
+                new Perceptron[] { outputNode }
+            };
+
+            var nwOut = nw.GetResult()[0];
+            Assert.AreEqual(outputNode.Output, nwOut);
+
+            var expOut = sigmoid.Calculate(sigmoid.Calculate(input) * weight);
+
+            Assert.AreEqual(nwOut, expOut);
         }
     }
 }

@@ -51,9 +51,9 @@ namespace NeuralNet {
             }
         }
 
-        public IEnumerable<float> GetResult() {
+        public float[] GetResult() {
             ResetPerceptronCache();
-            return Perceptrons[Perceptrons.Length - 1].Select(p => p.Output);
+            return Perceptrons[Perceptrons.Length - 1].Select(p => p.Output).ToArray();
         }
 
         public void ResetPerceptronCache() {
