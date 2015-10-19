@@ -43,16 +43,28 @@ namespace NeuralNet {
                 for(int percNr = 0; percNr < height; percNr++) {
                     IEnumerable<WeightedConnection> connections = Perceptrons[layerIndex - 1].Select(p => new WeightedConnection(connectionWeight, () => p.Output));
 
-                    var curPerceptron = new Perceptron(TransferFunction, connections);
+                    string percName = layerIndex == Perceptrons.Length - 1 ? $"Output {percNr}" : $"Hidden #{layerIndex - 1}.{percNr}";
+                    var curPerceptron = new Perceptron(TransferFunction, connections, percName);
                     curLayer.Add(curPerceptron);
                 }
                 Perceptrons[layerIndex] = curLayer.ToArray();
             }
         }
 
+        public IEnumerable<float> GetResult() {
+            ResetPerceptronCache();
+            return Perceptrons[Perceptrons.Length - 1].Select(p => p.Output);
+        }
+
+        public void ResetPerceptronCache() {
+            foreach(var perc in Perceptrons.SelectMany(p => p)) {
+                perc.ResetCache();
+            }
+        }
+
         private IEnumerable<Perceptron> CreateInputs(int count) {
             for(int i = 0; i < count; i++) {
-                yield return new Perceptron(TransferFunction, new SetValueConnection(0));
+                yield return new Perceptron(TransferFunction, new SetValueConnection(0), $"Input {i}");
             }
         }
     }
