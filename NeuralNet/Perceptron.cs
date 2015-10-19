@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 
 namespace NeuralNet {
 
-    [DebuggerDisplay("Perceptron out: {Output}")]
+    [DebuggerDisplay("Perceptron '{Name}' = [{Output}]")]
     public class Perceptron {
         private float? CachedOutput;
+
+        public string Name {
+            get;
+        }
 
         public TransferFunction Transfer {
             get;
@@ -23,12 +27,13 @@ namespace NeuralNet {
 
         public float Output => CachedOutput ?? (float)(CachedOutput = CalculateOutput());
 
-        public Perceptron(TransferFunction transferFunction, IEnumerable<Connection> connections) {
+        public Perceptron(TransferFunction transferFunction, IEnumerable<Connection> connections, string name = "X") {
             Transfer = transferFunction;
             Connections = connections.ToArray();
+            Name = name;
         }
 
-        public Perceptron(TransferFunction transferFunction, Connection singleConnection) : this(transferFunction, new Connection[] { singleConnection }) {
+        public Perceptron(TransferFunction transferFunction, Connection singleConnection, string name = "X") : this(transferFunction, new Connection[] { singleConnection }, name) {
         }
 
         public void ResetCache() {
