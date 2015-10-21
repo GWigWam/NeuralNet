@@ -40,10 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackpropagationTraining\Backpropagate.cs" />
+    <Compile Include="BackpropagationTraining\InputResultPair.cs" />
+    <Compile Include="Nodes\Bias.cs" />
     <Compile Include="Connections\Connection.cs" />
     <Compile Include="Connections\SetValueConnection.cs" />
+    <Compile Include="Nodes\INode.cs" />
     <Compile Include="Network.cs" />
-    <Compile Include="Perceptron.cs" />
+    <Compile Include="Nodes\Input.cs" />
+    <Compile Include="Nodes\Perceptron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Connections\WeightedConnection.cs" />
     <Compile Include="TransferFunctions\SigmoidFunction.cs" />

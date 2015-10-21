@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeuralNet;
 using NeuralNet.Connections;
+using NeuralNet.Nodes;
 using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
@@ -77,7 +78,7 @@ namespace Test {
             int layer2 = 4;
             int outputs = 1;
 
-            var nw = new Network(new SigmoidFunction());
+            var nw = new Network(new SigmoidFunction(), true);
             nw.FillNetwork(inputs, outputs, layer1, layer2);
 
             Assert.IsTrue(nw.Perceptrons[0].Length == inputs);
@@ -85,8 +86,8 @@ namespace Test {
             Assert.IsTrue(nw.Perceptrons[2].Length == layer2);
             Assert.IsTrue(nw.Perceptrons[3].Length == outputs);
 
-            Assert.IsTrue(nw.Perceptrons[3][0].Connections.Length == layer2);
-            Assert.IsTrue(nw.Perceptrons[2][3].Connections.Length == layer1);
+            Assert.IsTrue(((Perceptron)nw.Perceptrons[3][0]).Input.Length == layer2 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Perceptrons[2][3]).Input.Length == layer1 + 1); // +1 for bias node
         }
 
         [TestMethod]
@@ -96,7 +97,7 @@ namespace Test {
             float weight = (float)(rand.NextDouble() * 2);
 
             var sigmoid = new SigmoidFunction();
-            var nw = new Network(sigmoid);
+            var nw = new Network(sigmoid, false);
 
             var inputCon = new SetValueConnection(input);
             var inputNode = new Perceptron(sigmoid, inputCon, "Input");
@@ -123,20 +124,57 @@ namespace Test {
             float weight = (float)(rand.NextDouble() * 2);
 
             var sigmoid = new SigmoidFunction();
-            var nw = new Network(sigmoid);
+            var nw = new Network(sigmoid, false);
 
-            var inputCon = new SetValueConnection(0);
-            var inputNode = new Perceptron(sigmoid, inputCon, "Input");
+            var inputNode = new Input(input);
             var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
             var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
 
-            nw.Perceptrons = new Perceptron[][] {
-                new Perceptron[] { inputNode },
-                new Perceptron[] { outputNode }
+            nw.Perceptrons = new INode[][] {
+                new INode[] { inputNode },
+                new INode[] { outputNode }
             };
 
             var nwOut = nw.GetInputResult(input)[0];
-            var expOut = sigmoid.Calculate(sigmoid.Calculate(input) * weight);
+
+            //Output
+            // = Sig(inpToOut.Output)
+            // = Sig(inpToOut.Weight * inpToOut.GetInput())
+            // = Sig(inpToOut.Weight * inputNode.Output)
+            // = Sig(this.weight * this.input)
+            var expOut = sigmoid.Calculate(weight * input);
+
+            Assert.AreEqual(nwOut, expOut);
+        }
+
+        [TestMethod]
+        public void TestBias() {
+            float input = 0.3f;
+            float inpToOutWeight = 0.4f;
+            float biasToOutWeight = 0.5f;
+
+            var sigmoid = new SigmoidFunction();
+            var nw = new Network(sigmoid, false);
+
+            var inputNode = new Input(input);
+            var inpToOut = new WeightedConnection(inpToOutWeight, () => inputNode.Output);
+            var bias = new Bias();
+            var biasToOut = new WeightedConnection(biasToOutWeight, () => bias.Output);
+            var outputNode = new Perceptron(sigmoid, new Connection[] { inpToOut, biasToOut }, "Output");
+
+            nw.Perceptrons = new INode[][] {
+                new INode[] { inputNode },
+                new INode[] { outputNode }
+            };
+
+            var nwOut = nw.Perceptrons[1][0].Output;
+
+            //Output
+            // = Sig(inpToOut.Output + biasToOut.Output)
+            // = Sig((inpToOut.Weight * inpToOut.GetInput()) + (biasToOutWeight * 1))
+            // = Sig((inpToOut.Weight * inputNode.Output) + (biasToOutWeight))
+            // = Sig((this.weight * this.input) + (biasToOutWeight))
+            var expOut = sigmoid.Calculate((inpToOutWeight * input) + biasToOutWeight);
 
             Assert.AreEqual(nwOut, expOut);
         }

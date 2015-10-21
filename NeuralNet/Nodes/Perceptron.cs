@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NeuralNet {
+namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Perceptron '{Name}' = [{Output}]")]
-    public class Perceptron {
+    public class Perceptron : INode {
         private float? CachedOutput;
 
         public string Name {
@@ -21,7 +21,7 @@ namespace NeuralNet {
             get;
         }
 
-        public Connection[] Connections {
+        public Connection[] Input {
             get;
         }
 
@@ -29,7 +29,7 @@ namespace NeuralNet {
 
         public Perceptron(TransferFunction transferFunction, IEnumerable<Connection> connections, string name = "X") {
             TransferFunction = transferFunction;
-            Connections = connections.ToArray();
+            Input = connections.ToArray();
             Name = name;
         }
 
@@ -41,7 +41,7 @@ namespace NeuralNet {
         }
 
         private float CalculateOutput() {
-            var inputs = Connections.Select(c => c.Output);
+            var inputs = Input.Select(c => c.Output);
             var output = TransferFunction.Calculate(inputs);
             return output;
         }
