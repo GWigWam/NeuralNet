@@ -81,13 +81,13 @@ namespace Test {
             var nw = new Network(new SigmoidFunction(), true);
             nw.FillNetwork(inputs, outputs, layer1, layer2);
 
-            Assert.IsTrue(nw.Perceptrons[0].Length == inputs);
-            Assert.IsTrue(nw.Perceptrons[1].Length == layer1);
-            Assert.IsTrue(nw.Perceptrons[2].Length == layer2);
-            Assert.IsTrue(nw.Perceptrons[3].Length == outputs);
+            Assert.IsTrue(nw.Nodes[0].Length == inputs);
+            Assert.IsTrue(nw.Nodes[1].Length == layer1);
+            Assert.IsTrue(nw.Nodes[2].Length == layer2);
+            Assert.IsTrue(nw.Nodes[3].Length == outputs);
 
-            Assert.IsTrue(((Perceptron)nw.Perceptrons[3][0]).Input.Length == layer2 + 1); // +1 for bias node
-            Assert.IsTrue(((Perceptron)nw.Perceptrons[2][3]).Input.Length == layer1 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[3][0]).Input.Length == layer2 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[2][3]).Input.Length == layer1 + 1); // +1 for bias node
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace Test {
             var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
             var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
 
-            nw.Perceptrons = new Perceptron[][] {
+            nw.Nodes = new Perceptron[][] {
                 new Perceptron[] { inputNode },
                 new Perceptron[] { outputNode }
             };
@@ -130,7 +130,7 @@ namespace Test {
             var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
             var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
 
-            nw.Perceptrons = new INode[][] {
+            nw.Nodes = new INode[][] {
                 new INode[] { inputNode },
                 new INode[] { outputNode }
             };
@@ -162,12 +162,12 @@ namespace Test {
             var biasToOut = new WeightedConnection(biasToOutWeight, () => bias.Output);
             var outputNode = new Perceptron(sigmoid, new Connection[] { inpToOut, biasToOut }, "Output");
 
-            nw.Perceptrons = new INode[][] {
+            nw.Nodes = new INode[][] {
                 new INode[] { inputNode },
                 new INode[] { outputNode }
             };
 
-            var nwOut = nw.Perceptrons[1][0].Output;
+            var nwOut = nw.Nodes[1][0].Output;
 
             //Output
             // = Sig(inpToOut.Output + biasToOut.Output)
