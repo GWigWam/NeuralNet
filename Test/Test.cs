@@ -108,9 +108,34 @@ namespace Test {
                 new Perceptron[] { outputNode }
             };
 
-            var nwOut = nw.GetResult()[0];
+            var nwOut = nw.CurOutput()[0];
             Assert.AreEqual(outputNode.Output, nwOut);
 
+            var expOut = sigmoid.Calculate(sigmoid.Calculate(input) * weight);
+
+            Assert.AreEqual(nwOut, expOut);
+        }
+
+        [TestMethod]
+        public void TestGetInputResult() {
+            var rand = new Random();
+            float input = (float)(rand.NextDouble() * 100 + 1);
+            float weight = (float)(rand.NextDouble() * 2);
+
+            var sigmoid = new SigmoidFunction();
+            var nw = new Network(sigmoid);
+
+            var inputCon = new SetValueConnection(0);
+            var inputNode = new Perceptron(sigmoid, inputCon, "Input");
+            var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
+            var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
+
+            nw.Perceptrons = new Perceptron[][] {
+                new Perceptron[] { inputNode },
+                new Perceptron[] { outputNode }
+            };
+
+            var nwOut = nw.GetInputResult(input)[0];
             var expOut = sigmoid.Calculate(sigmoid.Calculate(input) * weight);
 
             Assert.AreEqual(nwOut, expOut);

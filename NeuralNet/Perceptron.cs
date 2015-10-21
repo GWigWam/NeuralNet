@@ -17,7 +17,7 @@ namespace NeuralNet {
             get;
         }
 
-        public TransferFunction Transfer {
+        public TransferFunction TransferFunction {
             get;
         }
 
@@ -28,7 +28,7 @@ namespace NeuralNet {
         public float Output => CachedOutput ?? (float)(CachedOutput = CalculateOutput());
 
         public Perceptron(TransferFunction transferFunction, IEnumerable<Connection> connections, string name = "X") {
-            Transfer = transferFunction;
+            TransferFunction = transferFunction;
             Connections = connections.ToArray();
             Name = name;
         }
@@ -42,7 +42,7 @@ namespace NeuralNet {
 
         private float CalculateOutput() {
             var inputs = Connections.Select(c => c.Output);
-            var output = Transfer.Calculate(inputs);
+            var output = TransferFunction.Calculate(inputs);
             return output;
         }
     }

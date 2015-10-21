@@ -1,1 +1,2 @@
-Vission: http://neuralnetworksanddeeplearning.com/chap1.html
+Vission:			http://neuralnetworksanddeeplearning.com/chap1.html
+Backpropagation:	http://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/

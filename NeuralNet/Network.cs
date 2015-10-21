@@ -51,8 +51,22 @@ namespace NeuralNet {
             }
         }
 
-        public float[] GetResult() {
-            ResetPerceptronCache();
+        public float[] GetInputResult(params float[] input) {
+            if(input.Length != Perceptrons[0].Length) {
+                throw new ArgumentOutOfRangeException(nameof(input));
+            }
+
+            for(int i = 0; i < input.Length; i++) {
+                ((SetValueConnection)Perceptrons[0][i].Connections[0]).Value = input[i];
+            }
+
+            return CurOutput();
+        }
+
+        public float[] CurOutput(bool ResetCache = true) {
+            if(ResetCache) {
+                ResetPerceptronCache();
+            }
             return Perceptrons[Perceptrons.Length - 1].Select(p => p.Output).ToArray();
         }
 
