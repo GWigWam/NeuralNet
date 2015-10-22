@@ -8,20 +8,15 @@ using System.Threading.Tasks;
 namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Input '{Name}' = [{Output}]")]
-    public class Input : INode {
+    public class Input : Node {
 
         public float Value {
             get; set;
         }
 
-        public string Name {
-            get;
-        }
+        public override float Output => Value;
 
-        public float Output => Value;
-
-        public Input(float initValue = 0, string name = "Input") {
-            Name = name;
+        public Input(float initValue = 0, string name = "X") : base(name) {
             Value = initValue;
         }
     }

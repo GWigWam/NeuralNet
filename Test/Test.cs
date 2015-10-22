@@ -22,25 +22,29 @@ namespace Test {
         }
 
         [TestMethod]
-        public void TestWeightedConnection() {
+        public void TestConnection() {
             float weight = 2f;
             float input = 5f;
-            var in1 = new Input(input);
-            var wc = new WeightedConnection(weight, in1);
+            var inp = new Input(input);
+            var outp = new Perceptron(new SigmoidFunction(), "Output");
+            var wc = Connection.Create(weight, inp, outp);
 
             Assert.AreEqual(wc.Output, weight * input);
+            Assert.AreEqual(inp.GetOutgoingConnections()[0], outp.GetIncommingConnections()[0]);
         }
 
         [TestMethod]
         public void TestPerceptronCaching() {
             float local1 = -10;
             float local2 = -5;
+
             var in1 = new Input(local1, "Input1");
             var in2 = new Input(local2, "Input2");
-            var c1 = new WeightedConnection(1, in1);
-            var c2 = new WeightedConnection(1.3f, in2);
+            var p = new Perceptron(new SigmoidFunction());
 
-            var p = new Perceptron(new SigmoidFunction(), new List<Connection>() { c1, c2 });
+            Connection.Create(0.5f, in1, p);
+            Connection.Create(1f, in2, p);
+
             Assert.IsTrue(p.Output < 0.1);
 
             in1.Value = 10;
@@ -68,8 +72,8 @@ namespace Test {
             Assert.IsTrue(nw.Nodes[2].Length == layer2);
             Assert.IsTrue(nw.Nodes[3].Length == outputs);
 
-            Assert.IsTrue(((Perceptron)nw.Nodes[3][0]).Input.Length == layer2 + 1); // +1 for bias node
-            Assert.IsTrue(((Perceptron)nw.Nodes[2][3]).Input.Length == layer1 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[3][0]).GetIncommingConnections().Length == layer2 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[2][3]).GetIncommingConnections().Length == layer1 + 1); // +1 for bias node
         }
 
         [TestMethod]
@@ -82,12 +86,12 @@ namespace Test {
             var nw = new Network(sigmoid, false);
 
             var inputNode = new Input(input);
-            var inpToOut = new WeightedConnection(weight, inputNode);
-            var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
+            var outputNode = new Perceptron(sigmoid, "Output");
+            Connection.Create(weight, inputNode, outputNode);
 
-            nw.Nodes = new INode[][] {
-                new INode[] { inputNode },
-                new INode[] { outputNode }
+            nw.Nodes = new Node[][] {
+                new Node[] { inputNode },
+                new Node[] { outputNode }
             };
 
             var nwOut = nw.CurOutput()[0];
@@ -108,12 +112,12 @@ namespace Test {
             var nw = new Network(sigmoid, false);
 
             var inputNode = new Input(input);
-            var inpToOut = new WeightedConnection(weight, inputNode);
-            var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
+            var outputNode = new Perceptron(sigmoid, "Output");
+            Connection.Create(weight, inputNode, outputNode);
 
-            nw.Nodes = new INode[][] {
-                new INode[] { inputNode },
-                new INode[] { outputNode }
+            nw.Nodes = new Node[][] {
+                new Node[] { inputNode },
+                new Node[] { outputNode }
             };
 
             var nwOut = nw.GetInputResult(input)[0];
@@ -138,14 +142,14 @@ namespace Test {
             var nw = new Network(sigmoid, false);
 
             var inputNode = new Input(input);
-            var inpToOut = new WeightedConnection(inpToOutWeight, inputNode);
             var bias = new Bias();
-            var biasToOut = new WeightedConnection(biasToOutWeight, bias);
-            var outputNode = new Perceptron(sigmoid, new Connection[] { inpToOut, biasToOut }, "Output");
+            var outputNode = new Perceptron(sigmoid, "Output");
+            Connection.Create(inpToOutWeight, inputNode, outputNode);
+            Connection.Create(biasToOutWeight, bias, outputNode);
 
-            nw.Nodes = new INode[][] {
-                new INode[] { inputNode },
-                new INode[] { outputNode }
+            nw.Nodes = new Node[][] {
+                new Node[] { inputNode },
+                new Node[] { outputNode }
             };
 
             var nwOut = nw.Nodes[1][0].Output;

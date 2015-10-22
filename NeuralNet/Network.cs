@@ -21,7 +21,7 @@ namespace NeuralNet {
             random = new Random();
 
             if(createBiasNode) {
-                Bias = new Bias();
+                Bias = new Bias("Bias");
             }
         }
 
@@ -30,7 +30,7 @@ namespace NeuralNet {
         }
 
         // Perceptrons [Column] [Index] where column 0 is the input layer
-        public INode[][] Nodes {
+        public Node[][] Nodes {
             get; set;
         }
 
@@ -40,7 +40,7 @@ namespace NeuralNet {
             nonInputLayers.Add(nrOutputs);
 
             //Init array
-            Nodes = new INode[nonInputLayers.Count + 1][];
+            Nodes = new Node[nonInputLayers.Count + 1][];
 
             //Inputs
             Nodes[0] = CreateInputs(nrInputs).ToArray();
@@ -50,19 +50,22 @@ namespace NeuralNet {
                 int height = nonInputLayers[layerIndex - 1];
 
                 var curLayer = new List<Perceptron>(height);
-                float connectionWeight = 1f / Nodes[layerIndex - 1].Length; //1.0 div. by Prev layer length
+                float connectionWeight = 1f / Nodes[layerIndex - 1].Length; //1 div by Prev layer length
                 for(int percNr = 0; percNr < height; percNr++) {
+                    //Create perceptron
+                    string name = layerIndex == Nodes.Length - 1 ? $"Output {percNr}" : $"Hidden #{layerIndex - 1}.{percNr}";
+                    var newPerceptron = new Perceptron(TransferFunction, name);
+
                     //Create input connections
-                    var connections = new List<WeightedConnection>();
-                    connections.AddRange(Nodes[layerIndex - 1].Select(p => new WeightedConnection(connectionWeight, p)));
-                    if(Bias != null) {
-                        connections.Add(new WeightedConnection(0.5f, Bias));
+                    foreach(var inp in Nodes[layerIndex - 1]) {
+                        Connection.Create(connectionWeight, inp, newPerceptron);
                     }
 
-                    //Create perceptron
-                    string percName = layerIndex == Nodes.Length - 1 ? $"Output {percNr}" : $"Hidden #{layerIndex - 1}.{percNr}";
-                    var curPerceptron = new Perceptron(TransferFunction, connections, percName);
-                    curLayer.Add(curPerceptron);
+                    if(Bias != null) {
+                        Connection.Create(0.5f, Bias, newPerceptron);
+                    }
+
+                    curLayer.Add(newPerceptron);
                 }
                 Nodes[layerIndex] = curLayer.ToArray();
             }
@@ -88,15 +91,13 @@ namespace NeuralNet {
         }
 
         public void RandomizeWeights() {
-            foreach(Connection connection in Nodes.SelectMany(p => p).SelectMany(p => (p as Perceptron)?.Input)) {
-                if(connection is WeightedConnection) {
-                    ((WeightedConnection)connection).Weight = (float)random.NextDouble();
-                }
+            foreach(Connection connection in Nodes.SelectMany(nodeAr => nodeAr).SelectMany(Node => Node.GetIncommingConnections())) {
+                connection.Weight = (float)random.NextDouble();
             }
         }
 
         public void ResetPerceptronCache() {
-            foreach(INode perc in Nodes.SelectMany(p => p)) {
+            foreach(Node perc in Nodes.SelectMany(p => p)) {
                 if(perc is Perceptron) {
                     ((Perceptron)perc).ResetCache();
                 }

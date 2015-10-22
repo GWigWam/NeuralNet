@@ -42,19 +42,15 @@
   <ItemGroup>
     <Compile Include="BackpropagationTraining\Backpropagate.cs" />
     <Compile Include="BackpropagationTraining\InputResultPair.cs" />
+    <Compile Include="Nodes\Connection.cs" />
     <Compile Include="Nodes\Bias.cs" />
-    <Compile Include="Connections\Connection.cs" />
-    <Compile Include="Nodes\INode.cs" />
+    <Compile Include="Nodes\Node.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Nodes\Input.cs" />
     <Compile Include="Nodes\Perceptron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Connections\WeightedConnection.cs" />
     <Compile Include="TransferFunctions\SigmoidFunction.cs" />
     <Compile Include="TransferFunctions\TransferFunction.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

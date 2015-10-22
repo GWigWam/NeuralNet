@@ -10,30 +10,17 @@ using System.Threading.Tasks;
 namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Perceptron '{Name}' = [{Output}]")]
-    public class Perceptron : INode {
+    public class Perceptron : Node {
         private float? CachedOutput;
-
-        public string Name {
-            get;
-        }
 
         public TransferFunction TransferFunction {
             get;
         }
 
-        public Connection[] Input {
-            get;
-        }
+        public override float Output => CachedOutput ?? (float)(CachedOutput = CalculateOutput());
 
-        public float Output => CachedOutput ?? (float)(CachedOutput = CalculateOutput());
-
-        public Perceptron(TransferFunction transferFunction, IEnumerable<Connection> connections, string name = "X") {
+        public Perceptron(TransferFunction transferFunction, string name = "X") : base(name) {
             TransferFunction = transferFunction;
-            Input = connections.ToArray();
-            Name = name;
-        }
-
-        public Perceptron(TransferFunction transferFunction, Connection singleConnection, string name = "X") : this(transferFunction, new Connection[] { singleConnection }, name) {
         }
 
         public void ResetCache() {
@@ -41,7 +28,7 @@ namespace NeuralNet.Nodes {
         }
 
         private float CalculateOutput() {
-            var inputs = Input.Select(c => c.Output);
+            var inputs = GetIncommingConnections().Select(c => c.Output);
             var output = TransferFunction.Calculate(inputs);
             return output;
         }

@@ -8,16 +8,10 @@ using System.Threading.Tasks;
 namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Bias '{Name}' = [{Output}]")]
-    public class Bias : INode {
+    public class Bias : Node {
+        public override float Output => 1;
 
-        public string Name {
-            get;
-        }
-
-        public float Output => 1;
-
-        public Bias(string name = "Bias") {
-            Name = name;
+        public Bias(string name = "X") : base(name) {
         }
     }
 }
