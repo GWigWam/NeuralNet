@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNet.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,17 +15,14 @@ namespace NeuralNet.Connections {
             get; set;
         }
 
-        public Func<float> GetInput {
+        public INode InputNode {
             get;
         }
 
-        public float Output => Weight * GetInput();
+        public float Output => Weight * InputNode.Output;
 
-        public WeightedConnection(float weight, Func<float> getInput) {
-            if(getInput == null) {
-                throw new ArgumentException($"{nameof(getInput)} must not be null", nameof(getInput));
-            }
-            GetInput = getInput;
+        public WeightedConnection(float weight, INode inputNode) {
+            InputNode = inputNode;
             Weight = weight;
         }
     }

@@ -22,47 +22,29 @@ namespace Test {
         }
 
         [TestMethod]
-        public void TestSetValueConnection() {
-            float testval = 10.3f;
-            var svc = new SetValueConnection(testval);
-
-            Assert.AreEqual(svc.Output, testval);
-        }
-
-        [TestMethod]
         public void TestWeightedConnection() {
             float weight = 2f;
             float input = 5f;
-            var wc = new WeightedConnection(weight, () => input);
+            var in1 = new Input(input);
+            var wc = new WeightedConnection(weight, in1);
 
             Assert.AreEqual(wc.Output, weight * input);
-        }
-
-        [TestMethod]
-        public void TestBasicPerceptron() {
-            string name = "TestName123";
-            List<Connection> connections = new List<Connection>() {
-                new SetValueConnection(10),
-                new SetValueConnection(20)
-            };
-
-            var p = new Perceptron(new SigmoidFunction(), connections, name);
-            Assert.IsTrue(p.Output > 0.9);
-            Assert.AreEqual(name, p.Name);
         }
 
         [TestMethod]
         public void TestPerceptronCaching() {
             float local1 = -10;
             float local2 = -5;
-            var c1 = new WeightedConnection(1, () => local1);
-            var c2 = new WeightedConnection(1.3f, () => local2);
+            var in1 = new Input(local1, "Input1");
+            var in2 = new Input(local2, "Input2");
+            var c1 = new WeightedConnection(1, in1);
+            var c2 = new WeightedConnection(1.3f, in2);
 
             var p = new Perceptron(new SigmoidFunction(), new List<Connection>() { c1, c2 });
             Assert.IsTrue(p.Output < 0.1);
 
-            local1 = 10;
-            local2 = 5;
+            in1.Value = 10;
+            in2.Value = 5;
 
             Assert.IsTrue(p.Output < 0.1);
 
@@ -93,26 +75,25 @@ namespace Test {
         [TestMethod]
         public void TestNetworkOutput() {
             var rand = new Random();
-            float input = (float)(rand.NextDouble() * 100);
-            float weight = (float)(rand.NextDouble() * 2);
+            float input = (float)(rand.NextDouble());
+            float weight = (float)(rand.NextDouble());
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
 
-            var inputCon = new SetValueConnection(input);
-            var inputNode = new Perceptron(sigmoid, inputCon, "Input");
-            var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
+            var inputNode = new Input(input);
+            var inpToOut = new WeightedConnection(weight, inputNode);
             var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
 
-            nw.Nodes = new Perceptron[][] {
-                new Perceptron[] { inputNode },
-                new Perceptron[] { outputNode }
+            nw.Nodes = new INode[][] {
+                new INode[] { inputNode },
+                new INode[] { outputNode }
             };
 
             var nwOut = nw.CurOutput()[0];
             Assert.AreEqual(outputNode.Output, nwOut);
 
-            var expOut = sigmoid.Calculate(sigmoid.Calculate(input) * weight);
+            var expOut = sigmoid.Calculate(input * weight);
 
             Assert.AreEqual(nwOut, expOut);
         }
@@ -127,7 +108,7 @@ namespace Test {
             var nw = new Network(sigmoid, false);
 
             var inputNode = new Input(input);
-            var inpToOut = new WeightedConnection(weight, () => inputNode.Output);
+            var inpToOut = new WeightedConnection(weight, inputNode);
             var outputNode = new Perceptron(sigmoid, inpToOut, "Output");
 
             nw.Nodes = new INode[][] {
@@ -157,9 +138,9 @@ namespace Test {
             var nw = new Network(sigmoid, false);
 
             var inputNode = new Input(input);
-            var inpToOut = new WeightedConnection(inpToOutWeight, () => inputNode.Output);
+            var inpToOut = new WeightedConnection(inpToOutWeight, inputNode);
             var bias = new Bias();
-            var biasToOut = new WeightedConnection(biasToOutWeight, () => bias.Output);
+            var biasToOut = new WeightedConnection(biasToOutWeight, bias);
             var outputNode = new Perceptron(sigmoid, new Connection[] { inpToOut, biasToOut }, "Output");
 
             nw.Nodes = new INode[][] {

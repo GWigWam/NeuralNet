@@ -44,7 +44,6 @@
     <Compile Include="BackpropagationTraining\InputResultPair.cs" />
     <Compile Include="Nodes\Bias.cs" />
     <Compile Include="Connections\Connection.cs" />
-    <Compile Include="Connections\SetValueConnection.cs" />
     <Compile Include="Nodes\INode.cs" />
     <Compile Include="Network.cs" />
     <Compile Include="Nodes\Input.cs" />

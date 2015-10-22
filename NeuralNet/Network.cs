@@ -54,9 +54,9 @@ namespace NeuralNet {
                 for(int percNr = 0; percNr < height; percNr++) {
                     //Create input connections
                     var connections = new List<WeightedConnection>();
-                    connections.AddRange(Nodes[layerIndex - 1].Select(p => new WeightedConnection(connectionWeight, () => p.Output)));
+                    connections.AddRange(Nodes[layerIndex - 1].Select(p => new WeightedConnection(connectionWeight, p)));
                     if(Bias != null) {
-                        connections.Add(new WeightedConnection(0.5f, () => Bias.Output));
+                        connections.Add(new WeightedConnection(0.5f, Bias));
                     }
 
                     //Create perceptron
