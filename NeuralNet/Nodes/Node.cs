@@ -47,5 +47,13 @@ namespace NeuralNet.Nodes {
                 throw new ArgumentException("Invalid connection");
             }
         }
+
+        internal void RemoveConnection(Connection connection) {
+            if(connection.FromNode == this) {
+                OutgoingConnections.Remove(connection);
+            } else if(connection.ToNode == this) {
+                IncommingConnections.Remove(connection);
+            }
+        }
     }
 }

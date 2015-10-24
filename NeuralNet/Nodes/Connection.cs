@@ -31,6 +31,10 @@ namespace NeuralNet.Connections {
             ToNode = toNode;
         }
 
+        public void Delete() {
+            Delete(this);
+        }
+
         public static Connection Create(float weight, Node fromNode, Node toNode) {
             var con = new Connection(weight, fromNode, toNode);
 
@@ -38,6 +42,11 @@ namespace NeuralNet.Connections {
             toNode.AddIncommingConnection(con);
 
             return con;
+        }
+
+        public static void Delete(Connection connection) {
+            connection.FromNode.RemoveConnection(connection);
+            connection.ToNode.RemoveConnection(connection);
         }
     }
 }

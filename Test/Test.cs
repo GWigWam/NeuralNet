@@ -163,5 +163,25 @@ namespace Test {
 
             Assert.AreEqual(nwOut, expOut);
         }
+
+        [TestMethod]
+        public void TestDelConnection() {
+            var inp = new Input(5);
+            var outp = new Perceptron(new SigmoidFunction());
+
+            var beforeConnect = outp.Output;
+
+            var con = Connection.Create(1, inp, outp);
+
+            outp.ResetCache();
+            var afterConnect = outp.Output;
+
+            Assert.AreNotEqual(beforeConnect, afterConnect);
+
+            con.Delete();
+            outp.ResetCache();
+
+            Assert.AreEqual(beforeConnect, outp.Output);
+        }
     }
 }
