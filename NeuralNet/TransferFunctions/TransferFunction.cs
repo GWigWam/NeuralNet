@@ -11,5 +11,7 @@ namespace NeuralNet.TransferFunctions {
         public float Calculate(params float[] input) => Calculate((IEnumerable<float>)input);
 
         public abstract float Calculate(IEnumerable<float> input);
+
+        public abstract float Derivative(float input);
     }
 }

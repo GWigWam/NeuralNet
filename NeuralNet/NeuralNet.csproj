@@ -41,7 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackpropagationTraining\Backpropagate.cs" />
-    <Compile Include="BackpropagationTraining\InputResultPair.cs" />
+    <Compile Include="BackpropagationTraining\InputExpectedResult.cs" />
+    <Compile Include="MathHelper.cs" />
     <Compile Include="Nodes\Connection.cs" />
     <Compile Include="Nodes\Bias.cs" />
     <Compile Include="Nodes\Node.cs" />

@@ -14,7 +14,12 @@ namespace NeuralNet.TransferFunctions {
         }
 
         private double Sigmoid(float input) {
-            var val = (1 / (1 + Math.Pow(Math.E, -input)));
+            var val = (1f / (1f + Math.Pow(Math.E, -input)));
+            return val;
+        }
+
+        public override float Derivative(float input) {
+            var val = input * (1f - input);
             return val;
         }
     }

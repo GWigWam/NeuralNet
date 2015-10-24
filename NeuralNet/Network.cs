@@ -12,7 +12,7 @@ namespace NeuralNet {
     public class Network {
         private Random random;
 
-        private TransferFunction TransferFunction {
+        public TransferFunction TransferFunction {
             get;
         }
 
