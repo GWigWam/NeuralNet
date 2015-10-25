@@ -40,8 +40,6 @@ namespace NeuralNet.BackpropagationTraining {
             float[] actual = Network.GetInputResult(irp.Input);
             float[] target = irp.Output;
 
-            var sse = SumSquaredError(target, actual);
-
             ConnectionInfluence = new Dictionary<Connection, float?>();
 
             //Loop trough all network nodes
@@ -60,18 +58,13 @@ namespace NeuralNet.BackpropagationTraining {
             }
 
             //Fill ConnectionInfluence values
-            foreach(var con in ConnectionInfluence.Keys.ToArray()) {
-                GetConnectionInfluence(con);
-            }
+            Parallel.ForEach(ConnectionInfluence.Keys.ToArray(), (con) => GetConnectionInfluence(con));
 
             //Update weights
             foreach(KeyValuePair<Connection, float?> conInfPair in ConnectionInfluence) {
                 float deltaWeight = -LearningRate * conInfPair.Value.Value * conInfPair.Key.FromNode.Output;
                 conInfPair.Key.Weight += deltaWeight;
             }
-
-            var newRes = Network.GetInputResult(irp.Input);
-            var newSse = SumSquaredError(target, newRes);
         }
 
         private float CalcOutputInfuence(Connection connection, float expectedOutput, float actualOutput) {
@@ -98,21 +91,6 @@ namespace NeuralNet.BackpropagationTraining {
             }
 
             return ConnectionInfluence[connection].Value;
-        }
-
-        public static float SquaredError(float target, float actual) {
-            var val = Math.Pow(target - actual, 2);
-            return (float)val;
-        }
-
-        public static float SumSquaredError(float[] target, float[] actual) {
-            float sum = 0;
-            for(int i = 0; i < target.Length; i++) {
-                float curErr = SquaredError(target[i], actual[i]);
-                sum += curErr;
-            }
-
-            return sum;
         }
     }
 }
