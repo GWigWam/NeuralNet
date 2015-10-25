@@ -53,5 +53,9 @@ namespace IrisSpecies {
                 throw new Exception();
             }
         }
+
+        public static bool IsOutputSuccess(float[] expected, float[] actual) {
+            return SpeciesFromOutput(actual) == SpeciesFromOutput(expected);
+        }
     }
 }

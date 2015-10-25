@@ -24,7 +24,7 @@ namespace IrisSpecies {
             }
 
             var network = new Network(new NeuralNet.TransferFunctions.SigmoidFunction(), true);
-            network.FillNetwork(4, 3, 100);
+            network.FillNetwork(4, 3, 7);
 
             var train = data.Take(TrainSetSize).ToArray();
             var inputAndExpectedResuls = train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput));
@@ -33,37 +33,25 @@ namespace IrisSpecies {
             var bp = new Backpropagate(network, inputAndExpectedResuls.ToArray(), 0.5f);
 
             int trains = 0;
-            float percentCorrect = 0;
-            while(percentCorrect <= 90) {
+            float score = 0;
+            var start = Environment.TickCount;
+            while(score < 80) {
                 trains++;
                 bp.Train();
 
-                int success = 0;
-                foreach(IrisEntry validate in validation) {
-                    var curOutp = network.GetInputResult(validate.AsInput);
-                    IrisSpecies result = IrisEntry.SpeciesFromOutput(curOutp);
-
-                    if(result == validate.Species) {
-                        success++;
-                    }
-                }
-                percentCorrect = 100f * success / validation.Length;
-                Console.WriteLine($"#{trains} {percentCorrect}% correct");
+                var stats = NetworkValidation.Validate(network, inputAndExpectedResuls, IrisEntry.IsOutputSuccess);
+                score = stats.SuccessPercentage;
+                Console.WriteLine($"{trains,-4}" + stats.ToString());
             }
-
+            Console.WriteLine($"\nTime elapsed: {Environment.TickCount - start}Ms");
             Console.WriteLine("Done training");
-            int doneSucces = 0;
-            foreach(IrisEntry entry in data) {
-                var curOutp = network.GetInputResult(entry.AsInput);
-                IrisSpecies result = IrisEntry.SpeciesFromOutput(curOutp);
 
-                if(result == entry.Species) {
-                    doneSucces++;
-                }
-            }
+            var trainStats = NetworkValidation.Validate(network, train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput)), IrisEntry.IsOutputSuccess);
+            var validateStats = NetworkValidation.Validate(network, validation.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput)), IrisEntry.IsOutputSuccess);
 
-            var percentDoneCorrect = 100 * doneSucces / data.Count();
-            Console.WriteLine($" {doneSucces}/{data.Count()} {percentDoneCorrect}% correct");
+            Console.WriteLine($"{trainStats.ToString()} TRAIN");
+            Console.WriteLine($"{validateStats.ToString()} VALIDATE");
+            Console.WriteLine($"{(trainStats + validateStats).ToString()} TOTAL");
 
             Console.ReadKey();
         }
