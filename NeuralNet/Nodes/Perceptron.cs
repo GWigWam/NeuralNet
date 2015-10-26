@@ -11,13 +11,13 @@ namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Perceptron '{Name}' = [{Output}]")]
     public class Perceptron : Node {
-        private float? CachedOutput;
+        private double? CachedOutput;
 
         public TransferFunction TransferFunction {
             get;
         }
 
-        public override float Output => CachedOutput ?? (float)(CachedOutput = CalculateOutput());
+        public override double Output => CachedOutput ?? (double)(CachedOutput = CalculateOutput());
 
         public Perceptron(TransferFunction transferFunction, string name = "X") : base(name) {
             TransferFunction = transferFunction;
@@ -27,7 +27,7 @@ namespace NeuralNet.Nodes {
             CachedOutput = null;
         }
 
-        private float CalculateOutput() {
+        private double CalculateOutput() {
             var inputs = GetIncommingConnections().Select(c => c.Output);
             var output = TransferFunction.Calculate(inputs);
             return output;

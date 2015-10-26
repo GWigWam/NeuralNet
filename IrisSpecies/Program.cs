@@ -24,18 +24,18 @@ namespace IrisSpecies {
             }
 
             var network = new Network(new NeuralNet.TransferFunctions.SigmoidFunction(), true);
-            network.FillNetwork(4, 3, 7);
+            network.FillNetwork(4, 3, 4, 4);
 
             var train = data.Take(TrainSetSize).ToArray();
             var inputAndExpectedResuls = train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput));
             var validation = data.Skip(TrainSetSize).ToArray();
 
-            var bp = new Backpropagate(network, inputAndExpectedResuls.ToArray(), 0.5f);
+            var bp = new Backpropagate(network, inputAndExpectedResuls.ToArray(), 0.5);
 
             int trains = 0;
-            float score = 0;
+            double score = 0;
             var start = Environment.TickCount;
-            while(score < 80) {
+            while(score < 90) {
                 trains++;
                 bp.Train();
 

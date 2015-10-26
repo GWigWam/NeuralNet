@@ -10,13 +10,13 @@ namespace NeuralNet.Nodes {
     [DebuggerDisplay("Input '{Name}' = [{Output}]")]
     public class Input : Node {
 
-        public float Value {
+        public double Value {
             get; set;
         }
 
-        public override float Output => Value;
+        public override double Output => Value;
 
-        public Input(float initValue = 0, string name = "X") : base(name) {
+        public Input(double initValue = 0, string name = "X") : base(name) {
             Value = initValue;
         }
     }

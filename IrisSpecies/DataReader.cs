@@ -17,10 +17,10 @@ namespace IrisSpecies {
             foreach(string entry in fullText.Split('\n')) {
                 var split = entry.Split(',');
                 if(split.Length == 5) {
-                    float sepalLength = float.Parse(split[0], CultureInfo.InvariantCulture);
-                    float sepalWidth = float.Parse(split[1], CultureInfo.InvariantCulture);
-                    float petalLength = float.Parse(split[2], CultureInfo.InvariantCulture);
-                    float petalWidth = float.Parse(split[3], CultureInfo.InvariantCulture);
+                    double sepalLength = double.Parse(split[0], CultureInfo.InvariantCulture);
+                    double sepalWidth = double.Parse(split[1], CultureInfo.InvariantCulture);
+                    double petalLength = double.Parse(split[2], CultureInfo.InvariantCulture);
+                    double petalWidth = double.Parse(split[3], CultureInfo.InvariantCulture);
 
                     IrisSpecies species;
                     if(split[4].StartsWith("Iris-s")) {

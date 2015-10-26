@@ -1,10 +1,10 @@
 ﻿namespace NeuralNet {
 
     public struct InputExpectedResult {
-        public readonly float[] Input;
-        public readonly float[] Output;
+        public readonly double[] Input;
+        public readonly double[] Output;
 
-        public InputExpectedResult(float[] input, float[] output) {
+        public InputExpectedResult(double[] input, double[] output) {
             Input = input;
             Output = output;
         }

@@ -11,16 +11,16 @@ namespace IrisSpecies {
     }
 
     internal class IrisEntry {
-        public float SepalLength;
-        public float SepalWidth;
-        public float PetalLength;
-        public float PetalWidth;
+        public double SepalLength;
+        public double SepalWidth;
+        public double PetalLength;
+        public double PetalWidth;
         public IrisSpecies Species;
 
-        public float[] AsInput => new float[] { SepalLength, SepalWidth, PetalLength, PetalWidth };
-        public float[] AsOutput => (Species == IrisSpecies.Setosa) ? new float[] { 1, 0, 0 } : (Species == IrisSpecies.Versicolor) ? new float[] { 0, 1, 0 } : new float[] { 0, 0, 1 };
+        public double[] AsInput => new double[] { SepalLength, SepalWidth, PetalLength, PetalWidth };
+        public double[] AsOutput => (Species == IrisSpecies.Setosa) ? new double[] { 1, 0, 0 } : (Species == IrisSpecies.Versicolor) ? new double[] { 0, 1, 0 } : new double[] { 0, 0, 1 };
 
-        public IrisEntry(float sl, float sw, float pl, float pw, IrisSpecies species) {
+        public IrisEntry(double sl, double sw, double pl, double pw, IrisSpecies species) {
             SepalLength = sl;
             SepalWidth = sw;
             PetalLength = pl;
@@ -28,8 +28,8 @@ namespace IrisSpecies {
             Species = species;
         }
 
-        public static IrisSpecies SpeciesFromOutput(float[] output) {
-            float maxVal = int.MinValue;
+        public static IrisSpecies SpeciesFromOutput(double[] output) {
+            double maxVal = int.MinValue;
             int maxIndex = -1;
             for(int i = 0; i < output.Length; i++) {
                 var curOutp = output[i];
@@ -54,7 +54,7 @@ namespace IrisSpecies {
             }
         }
 
-        public static bool IsOutputSuccess(float[] expected, float[] actual) {
+        public static bool IsOutputSuccess(double[] expected, double[] actual) {
             return SpeciesFromOutput(actual) == SpeciesFromOutput(expected);
         }
     }

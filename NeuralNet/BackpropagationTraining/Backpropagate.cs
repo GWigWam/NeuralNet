@@ -10,7 +10,7 @@ namespace NeuralNet.BackpropagationTraining {
 
     public class Backpropagate {
 
-        public float LearningRate {
+        public double LearningRate {
             get; set;
         }
 
@@ -22,12 +22,14 @@ namespace NeuralNet.BackpropagationTraining {
             get;
         }
 
-        private Dictionary<Connection, float?> ConnectionInfluence;
+        private volatile Dictionary<Connection, double?> ConnectionInfluence;
 
-        public Backpropagate(Network network, InputExpectedResult[] expected, float learningRate = 0.5f) {
+        public Backpropagate(Network network, InputExpectedResult[] expected, double learningRate = 0.5) {
             Network = network;
             Expected = expected;
             LearningRate = learningRate;
+
+            ConnectionInfluence = new Dictionary<Connection, double?>();
         }
 
         public void Train() {
@@ -37,17 +39,17 @@ namespace NeuralNet.BackpropagationTraining {
         }
 
         private void AdjustWeights(InputExpectedResult irp) {
-            float[] actual = Network.GetInputResult(irp.Input);
-            float[] target = irp.Output;
+            double[] actual = Network.GetInputResult(irp.Input);
+            double[] target = irp.Output;
 
-            ConnectionInfluence = new Dictionary<Connection, float?>();
+            ConnectionInfluence.Clear();
 
             //Loop trough all network nodes
             for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
                 for(int index = 0; index < Network.Nodes[layer].Length; index++) {
                     //Loop trough current nodes incomming connections
                     foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
-                        float? precalc = null;
+                        double? precalc = null;
                         if(layer == Network.Nodes.Length - 1) { //Is output layer
                             precalc = CalcOutputInfuence(con, target[index], actual[index]);
                         }
@@ -58,17 +60,23 @@ namespace NeuralNet.BackpropagationTraining {
             }
 
             //Fill ConnectionInfluence values
-            Parallel.ForEach(ConnectionInfluence.Keys.ToArray(), (con) => GetConnectionInfluence(con));
+            Parallel.ForEach(ConnectionInfluence.Keys.ToArray(),
+#if DEBUG
+                new ParallelOptions() { MaxDegreeOfParallelism = 1 }, // When debuggin don't use parallelism
+#endif
+                (con) => GetConnectionInfluence(con));
 
             //Update weights
-            foreach(KeyValuePair<Connection, float?> conInfPair in ConnectionInfluence) {
-                float deltaWeight = -LearningRate * conInfPair.Value.Value * conInfPair.Key.FromNode.Output;
+            foreach(KeyValuePair<Connection, double?> conInfPair in ConnectionInfluence) {
+                double outputInfluence = conInfPair.Value.Value * conInfPair.Key.FromNode.Output;
+                double deltaWeight = -LearningRate * outputInfluence;
                 conInfPair.Key.Weight += deltaWeight;
             }
         }
 
-        private float CalcOutputInfuence(Connection connection, float expectedOutput, float actualOutput) {
-            float outcome = Network.TransferFunction.Derivative(actualOutput) * (actualOutput - expectedOutput);
+        private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {
+            double dif = (-(expectedOutput - actualOutput));
+            double outcome = dif * Network.TransferFunction.Derivative(actualOutput);
             return outcome;
         }
 
@@ -76,16 +84,19 @@ namespace NeuralNet.BackpropagationTraining {
         /// Calculates connection influence value IF it is not yet present in ConnectionInfluence dictionary
         /// Stores result in the dictionary and then returns it
         /// </summary>
-        private float GetConnectionInfluence(Connection connection) {
+        private double GetConnectionInfluence(Connection connection) {
             if(!ConnectionInfluence[connection].HasValue) {
-                float sumInfluenceOutput = 0;
+                double sumInfluenceOutput = 0;
                 foreach(var outgoing in connection.ToNode.GetOutgoingConnections()) {
-                    float curInfluence = GetConnectionInfluence(outgoing) * outgoing.Weight;
+                    double connectionInfluence = GetConnectionInfluence(outgoing);
+                    double curInfluence = connectionInfluence * outgoing.Weight;
                     sumInfluenceOutput += curInfluence;
                 }
 
-                float fromOutput = connection.FromNode.Output;
-                float influence = Network.TransferFunction.Derivative(fromOutput) * sumInfluenceOutput;
+                double fromOutput = connection.FromNode.Output;
+                double outDeriv = Network.TransferFunction.Derivative(connection.ToNode.Output);
+
+                double influence = sumInfluenceOutput * outDeriv;
 
                 ConnectionInfluence[connection] = influence;
             }

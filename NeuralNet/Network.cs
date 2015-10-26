@@ -26,7 +26,7 @@ namespace NeuralNet {
         }
 
         public Bias Bias {
-            get;
+            get; set;
         }
 
         // Perceptrons [Column] [Index] where column 0 is the input layer
@@ -50,7 +50,7 @@ namespace NeuralNet {
                 int height = nonInputLayers[layerIndex - 1];
 
                 var curLayer = new List<Perceptron>(height);
-                float connectionWeight = 1f / Nodes[layerIndex - 1].Length; //1 div by Prev layer length
+                double connectionWeight = 1.0 / Nodes[layerIndex - 1].Length; //1 div by Prev layer length
                 for(int percNr = 0; percNr < height; percNr++) {
                     //Create perceptron
                     string name = layerIndex == Nodes.Length - 1 ? $"Output {percNr}" : $"Hidden #{layerIndex - 1}.{percNr}";
@@ -62,7 +62,7 @@ namespace NeuralNet {
                     }
 
                     if(Bias != null) {
-                        Connection.Create(0.5f, Bias, newPerceptron);
+                        Connection.Create(0.5, Bias, newPerceptron);
                     }
 
                     curLayer.Add(newPerceptron);
@@ -71,7 +71,7 @@ namespace NeuralNet {
             }
         }
 
-        public float[] GetInputResult(params float[] input) {
+        public double[] GetInputResult(params double[] input) {
             if(input.Length != Nodes[0].Length) {
                 throw new ArgumentOutOfRangeException(nameof(input));
             }
@@ -83,7 +83,7 @@ namespace NeuralNet {
             return CurOutput();
         }
 
-        public float[] CurOutput(bool ResetCache = true) {
+        public double[] CurOutput(bool ResetCache = true) {
             if(ResetCache) {
                 ResetPerceptronCache();
             }
@@ -92,7 +92,7 @@ namespace NeuralNet {
 
         public void RandomizeWeights() {
             foreach(Connection connection in Nodes.SelectMany(nodeAr => nodeAr).SelectMany(Node => Node.GetIncommingConnections())) {
-                connection.Weight = (float)random.NextDouble();
+                connection.Weight = random.NextDouble();
             }
         }
 

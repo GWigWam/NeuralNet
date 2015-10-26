@@ -8,18 +8,18 @@ namespace NeuralNet.TransferFunctions {
 
     public class SigmoidFunction : TransferFunction {
 
-        public override float Calculate(IEnumerable<float> input) {
+        public override double Calculate(IEnumerable<double> input) {
             var val = Sigmoid(input.Sum());
-            return (float)val;
-        }
-
-        private double Sigmoid(float input) {
-            var val = (1f / (1f + Math.Pow(Math.E, -input)));
             return val;
         }
 
-        public override float Derivative(float input) {
-            var val = input * (1f - input);
+        private double Sigmoid(double input) {
+            var val = (1.0 / (1.0 + Math.Pow(Math.E, -input)));
+            return val;
+        }
+
+        public override double Derivative(double input) {
+            var val = input * (1.0 - input);
             return val;
         }
     }

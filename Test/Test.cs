@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeuralNet;
+using NeuralNet.BackpropagationTraining;
 using NeuralNet.Connections;
 using NeuralNet.Nodes;
 using NeuralNet.TransferFunctions;
@@ -23,8 +24,8 @@ namespace Test {
 
         [TestMethod]
         public void TestConnection() {
-            float weight = 2f;
-            float input = 5f;
+            double weight = 2;
+            double input = 5;
             var inp = new Input(input);
             var outp = new Perceptron(new SigmoidFunction(), "Output");
             var wc = Connection.Create(weight, inp, outp);
@@ -35,15 +36,15 @@ namespace Test {
 
         [TestMethod]
         public void TestPerceptronCaching() {
-            float local1 = -10;
-            float local2 = -5;
+            double local1 = -10;
+            double local2 = -5;
 
             var in1 = new Input(local1, "Input1");
             var in2 = new Input(local2, "Input2");
             var p = new Perceptron(new SigmoidFunction());
 
-            Connection.Create(0.5f, in1, p);
-            Connection.Create(1f, in2, p);
+            Connection.Create(0.5, in1, p);
+            Connection.Create(1, in2, p);
 
             Assert.IsTrue(p.Output < 0.1);
 
@@ -79,8 +80,8 @@ namespace Test {
         [TestMethod]
         public void TestNetworkOutput() {
             var rand = new Random();
-            float input = (float)(rand.NextDouble());
-            float weight = (float)(rand.NextDouble());
+            double input = (double)(rand.NextDouble());
+            double weight = (double)(rand.NextDouble());
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -105,8 +106,8 @@ namespace Test {
         [TestMethod]
         public void TestGetInputResult() {
             var rand = new Random();
-            float input = (float)(rand.NextDouble() * 100 + 1);
-            float weight = (float)(rand.NextDouble() * 2);
+            double input = (double)(rand.NextDouble() * 100 + 1);
+            double weight = (double)(rand.NextDouble() * 2);
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -134,9 +135,9 @@ namespace Test {
 
         [TestMethod]
         public void TestBias() {
-            float input = 0.3f;
-            float inpToOutWeight = 0.4f;
-            float biasToOutWeight = 0.5f;
+            double input = 0.3;
+            double inpToOutWeight = 0.4;
+            double biasToOutWeight = 0.5;
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -182,6 +183,34 @@ namespace Test {
             outp.ResetCache();
 
             Assert.AreEqual(beforeConnect, outp.Output);
+        }
+
+        [TestMethod]
+        public void TestTraining() {
+            var sigmoid = new SigmoidFunction();
+
+            var net = new Network(sigmoid, true);
+            net.FillNetwork(2, 2, 2);
+
+            net.Nodes[0][0].GetOutgoingConnections()[0].Weight = .15;
+            net.Nodes[0][0].GetOutgoingConnections()[1].Weight = .2;
+            net.Nodes[0][1].GetOutgoingConnections()[0].Weight = .25;
+            net.Nodes[0][1].GetOutgoingConnections()[1].Weight = .3;
+            net.Nodes[1][0].GetOutgoingConnections()[0].Weight = .4;
+            net.Nodes[1][0].GetOutgoingConnections()[1].Weight = .45;
+            net.Nodes[1][1].GetOutgoingConnections()[0].Weight = .5;
+            net.Nodes[1][1].GetOutgoingConnections()[1].Weight = .55;
+
+            var expected = new InputExpectedResult(new double[] { .05, .1 }, new double[] { .01, .99 });
+
+            var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+
+            var bp = new Backpropagate(net, new InputExpectedResult[] { expected }, 0.5);
+            bp.Train();
+
+            var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+
+            Assert.IsTrue(before.AvgSSE > after.AvgSSE);
         }
     }
 }

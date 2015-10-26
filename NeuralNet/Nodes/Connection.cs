@@ -11,7 +11,7 @@ namespace NeuralNet.Connections {
     [DebuggerDisplay("Connection {FromNode.Name} --> {ToNode.Name}")]
     public class Connection {
 
-        public float Weight {
+        public double Weight {
             get; set;
         }
 
@@ -23,9 +23,9 @@ namespace NeuralNet.Connections {
             get;
         }
 
-        public float Output => Weight * FromNode.Output;
+        public double Output => Weight * FromNode.Output;
 
-        private Connection(float weight, Node fromNode, Node toNode) {
+        private Connection(double weight, Node fromNode, Node toNode) {
             Weight = weight;
             FromNode = fromNode;
             ToNode = toNode;
@@ -35,7 +35,7 @@ namespace NeuralNet.Connections {
             Delete(this);
         }
 
-        public static Connection Create(float weight, Node fromNode, Node toNode) {
+        public static Connection Create(double weight, Node fromNode, Node toNode) {
             var con = new Connection(weight, fromNode, toNode);
 
             fromNode.AddOutgoingConnection(con);
