@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IrisSpecies", "IrisSpecies\IrisSpecies.csproj", "{344CCFBB-1008-4766-B117-FAF481709EC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Handwriting", "Handwriting\Handwriting.csproj", "{9861A88F-1D7C-449A-A694-E506E2B99381}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +34,10 @@ Global
 		{344CCFBB-1008-4766-B117-FAF481709EC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{344CCFBB-1008-4766-B117-FAF481709EC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{344CCFBB-1008-4766-B117-FAF481709EC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9861A88F-1D7C-449A-A694-E506E2B99381}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9861A88F-1D7C-449A-A694-E506E2B99381}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9861A88F-1D7C-449A-A694-E506E2B99381}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9861A88F-1D7C-449A-A694-E506E2B99381}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
