@@ -11,7 +11,7 @@ namespace Handwriting {
 
     public static class ImageHelper {
 
-        public static Bitmap CropWhitespace(this Bitmap bmp, bool square) {
+        public static Bitmap CropWhitespace(this Bitmap bmp) {
             int bitPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat);
 
             if(bitPerPixel != 24 && bitPerPixel != 32)
@@ -23,7 +23,6 @@ namespace Handwriting {
             var top = bmp.Height;
 
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
-
             unsafe
             {
                 byte* dataPtr = (byte*)bmpData.Scan0;
@@ -59,22 +58,34 @@ namespace Handwriting {
                     dataPtr += bmpData.Stride;
                 }
             }
-
             bmp.UnlockBits(bmpData);
 
             if(left < right && top < bottom) {
                 var width = right - left;
                 var height = bottom - top;
 
-                if(square) {
-                    var largestDimention = width > height ? width : height;
-                    return bmp.Clone(new Rectangle(left, top, largestDimention, largestDimention), bmp.PixelFormat);
-                } else {
-                    return bmp.Clone(new Rectangle(left, top, width, height), bmp.PixelFormat);
-                }
+                var croppedImg = bmp.Clone(new Rectangle(left, top, width, height), bmp.PixelFormat);
+                return croppedImg;
+            } else {
+                return bmp; // Entire image should be cropped, it is empty
+            }
+        }
+
+        public static Bitmap Square(this Bitmap image) {
+            var dimentions = image.Width > image.Height ? image.Width : image.Height;
+
+            var squareImg = new Bitmap(dimentions, dimentions, image.PixelFormat);
+
+            using(var graphics = Graphics.FromImage(squareImg)) {
+                graphics.Clear(Color.White);
+
+                int x = (dimentions - image.Width) / 2;
+                int y = (dimentions - image.Height) / 2;
+
+                graphics.DrawImageUnscaled(image, x, y);
             }
 
-            return null; // Entire image should be cropped, so just return null
+            return squareImg;
         }
 
         public static Bitmap Resize(this Bitmap image, int width, int height, bool highQuality) {

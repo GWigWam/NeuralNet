@@ -18,9 +18,7 @@ namespace Handwriting {
             FileFormat = new Regex(@"_(?<char>[^_]+)_[A-Z0-9]+?.bmp$");
         }
 
-        public static IEnumerable<Bitmap> ReadFromDir(string dirLoc, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions) {
-            int tmp = 0;
-
+        public static List<Bitmap> ReadFromDir(string dirLoc, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions) {
             var imgs = new List<Bitmap>();
             foreach(FileInfo file in new DirectoryInfo(dirLoc).GetFiles("*.bmp", SearchOption.AllDirectories)) {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
@@ -29,17 +27,12 @@ namespace Handwriting {
                     Bitmap img = (Bitmap)Image.FromFile(file.FullName);
 
                     if(cropWhitespace)
-                        img = img.CropWhitespace(true);
+                        img = img.CropWhitespace();
 
+                    img = img.Square();
                     img = img.Resize(dimentions, dimentions, highQuality);
 
                     imgs.Add(img);
-
-                    tmp++;
-                    if(tmp % 10 == 0) {
-                        Console.WriteLine($"Now at {tmp}");
-                        Console.ReadKey();
-                    }
                 }
             }
 
