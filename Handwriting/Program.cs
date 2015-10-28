@@ -10,7 +10,9 @@ namespace Handwriting {
         private const string dirLoc = "F:/Zooi/github/NeuralNet/Handwriting/data/img";
 
         private static void Main(string[] args) {
-            ImageReader.ReadFromDir(dirLoc);
+            var imgs = ImageReader.ReadFromDir(dirLoc, true, true, true, 64);
+
+            Console.ReadKey();
         }
     }
 }
