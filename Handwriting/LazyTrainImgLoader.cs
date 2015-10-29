@@ -1,5 +1,6 @@
 ﻿using NeuralNet;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -42,7 +43,7 @@ namespace Handwriting {
 
         private Task PreLoadTask;
 
-        private volatile List<InputExpectedResult> PreLoaded;
+        private volatile ConcurrentBag<InputExpectedResult> PreLoaded;
 
         private volatile bool Loading;
 
@@ -52,7 +53,7 @@ namespace Handwriting {
         public int FileCount => Files.Length;
 
         public LazyTrainImgLoader(string dirLoc, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions, int batchSize) {
-            PreLoaded = new List<InputExpectedResult>();
+            PreLoaded = new ConcurrentBag<InputExpectedResult>();
             OnlyNumbers = onlyNumbers;
             CropWhitespace = cropWhitespace;
             HighQuality = highQuality;
@@ -66,7 +67,7 @@ namespace Handwriting {
 
         public InputExpectedResult[] GetNextBatch() {
             if(Loading) {
-                Console.WriteLine("Next batch requested, but not yet done loading");
+                PerformanceLog.Log("Next batch requested, but not yet done loading");
                 PreLoadTask.Wait();
             }
 
@@ -106,7 +107,7 @@ namespace Handwriting {
 
         private void StartPreLoad() {
             Loading = true;
-            PreLoaded.Clear();
+            PreLoaded = new ConcurrentBag<InputExpectedResult>();
 
             PreLoadTask = new Task(() => {
                 if(curIndex <= Files.Length) {
