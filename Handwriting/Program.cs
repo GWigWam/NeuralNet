@@ -1,27 +1,47 @@
-﻿using System;
+﻿using NeuralNet;
+using NeuralNet.BackpropagationTraining;
+using NeuralNet.TransferFunctions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static NeuralNet.PerformanceLog;
 
 namespace Handwriting {
 
     public class Program {
         private const string dirLoc = "F:/Zooi/github/NeuralNet/Handwriting/data/img";
+        private const int dimentions = 32;
 
         private static void Main(string[] args) {
-            var loadStart = Environment.TickCount;
-            var imgs = ImageReader.ReadFromDir(dirLoc, true, true, true, 32);
-            Console.WriteLine($"Done loading after {Environment.TickCount - loadStart}Ms");
+            Log("Start");
+            var imgLoader = new LazyTrainImgLoader(dirLoc, true, true, true, dimentions, 100);
 
-            var greyCalcStart = Environment.TickCount;
-            var asGreyVals = imgs.Select(img => img.GreyValues()).ToArray();
-            Console.WriteLine($"Done calculating grey values after {Environment.TickCount - greyCalcStart}Ms");
+            Log("ImageLoader read, create & train network");
+            var network = new Network(new SigmoidFunction(), true);
+            network.FillNetwork(dimentions * dimentions, 10, 15);
 
-            foreach(var val in asGreyVals.Skip(100).Take(7)) {
-                PrintGreyValueImg(val);
-                Console.WriteLine();
+            var backpropTraining = new Backpropagate(network, 0.5);
+
+            bool cancelTrain = false;
+            Console.CancelKeyPress += (obj, evArgs) => {
+                if(!cancelTrain) {
+                    cancelTrain = true;
+                    evArgs.Cancel = false;
+                }
+            };
+
+            InputExpectedResult[] trainData;
+            while(!cancelTrain && (trainData = imgLoader.GetNextBatch()).Length > 0) {
+                backpropTraining.Train(trainData);
+                Log("End single train");
+
+                var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
+                Console.WriteLine($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | " + stats.ToString());
+                Log("End stat gather");
             }
+            Log("Done training");
 
             Console.ReadKey();
         }
@@ -41,6 +61,17 @@ namespace Handwriting {
 
                 Console.Write(' ');
             }
+        }
+
+        private static bool IsImgRecogSuccess(double[] expected, double[] actual) {
+            for(int i = 0; i < expected.Length; i++) {
+                if(expected[i] == 1) {
+                    var success = actual.Max() == actual[i];
+                    return success;
+                }
+            }
+
+            return false;
         }
     }
 }
