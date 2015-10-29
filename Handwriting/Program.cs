@@ -24,16 +24,8 @@ namespace Handwriting {
 
             var backpropTraining = new Backpropagate(network, 0.5);
 
-            bool cancelTrain = false;
-            Console.CancelKeyPress += (obj, evArgs) => {
-                if(!cancelTrain) {
-                    cancelTrain = true;
-                    evArgs.Cancel = false;
-                }
-            };
-
             InputExpectedResult[] trainData;
-            while(!cancelTrain && (trainData = imgLoader.GetNextBatch()).Length > 0) {
+            while((trainData = imgLoader.GetNextBatch()).Length > 0) {
                 backpropTraining.Train(trainData);
 
                 var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
