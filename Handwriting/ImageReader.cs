@@ -20,7 +20,9 @@ namespace Handwriting {
 
         public static List<Bitmap> ReadFromDir(string dirLoc, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions) {
             var imgs = new List<Bitmap>();
-            foreach(FileInfo file in new DirectoryInfo(dirLoc).GetFiles("*.bmp", SearchOption.AllDirectories)) {
+            var files = new DirectoryInfo(dirLoc).GetFiles("*.bmp", SearchOption.AllDirectories);
+
+            Parallel.ForEach(files, (file) => {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
                 char curChar;
                 if(char.TryParse(readChar, out curChar) && (!onlyNumbers || char.IsNumber(curChar))) {
@@ -34,7 +36,7 @@ namespace Handwriting {
 
                     imgs.Add(img);
                 }
-            }
+            });
 
             return imgs;
         }
