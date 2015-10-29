@@ -16,7 +16,7 @@ namespace NeuralNet {
         public static void Log(string s) {
             var now = Environment.TickCount;
             var timeDif = now - lastLog;
-            Console.WriteLine($"{timeDif}Ms | {s}");
+            Console.WriteLine($"{timeDif,-5}Ms | {s}");
 
             lastLog = now;
         }

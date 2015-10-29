@@ -35,11 +35,9 @@ namespace Handwriting {
             InputExpectedResult[] trainData;
             while(!cancelTrain && (trainData = imgLoader.GetNextBatch()).Length > 0) {
                 backpropTraining.Train(trainData);
-                Log("End single train");
 
                 var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
-                Console.WriteLine($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | " + stats.ToString());
-                Log("End stat gather");
+                Log($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | " + stats.ToString());
             }
             Log("Done training");
 

@@ -21,11 +21,24 @@ namespace NeuralNet.BackpropagationTraining {
 
         private volatile Dictionary<Connection, double?> ConnectionInfluence;
 
+        private Connection[] AllConnections;
+
         public Backpropagate(Network network, double learningRate = 0.5) {
             Network = network;
             LearningRate = learningRate;
 
-            ConnectionInfluence = new Dictionary<Connection, double?>();
+            //Loop trough all network connections and add them to ConnectionInfluence list
+            ConnectionInfluence = new Dictionary<Connection, double?>(/*new Connection.ConnectionComparer()*/);
+            for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
+                for(int index = 0; index < Network.Nodes[layer].Length; index++) {
+                    //Loop trough current nodes incomming connections
+                    foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
+                        ConnectionInfluence.Add(con, null);
+                    }
+                }
+            }
+
+            AllConnections = ConnectionInfluence.Keys.ToArray();
         }
 
         public void Train(InputExpectedResult[] expected) {
@@ -38,32 +51,29 @@ namespace NeuralNet.BackpropagationTraining {
             double[] actual = Network.GetInputResult(irp.Input);
             double[] target = irp.Output;
 
-            ConnectionInfluence.Clear();
+            //Reset influence values
+            foreach(var key in AllConnections) {
+                ConnectionInfluence[key] = null;
+            }
 
-            //Loop trough all network nodes
-            for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
-                for(int index = 0; index < Network.Nodes[layer].Length; index++) {
-                    //Loop trough current nodes incomming connections
-                    foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
-                        double? precalc = null;
-                        if(layer == Network.Nodes.Length - 1) { //Is output layer
-                            precalc = CalcOutputInfuence(con, target[index], actual[index]);
-                        }
+            //Set output influence value
+            for(int nodeIndex = 0; nodeIndex < Network.Nodes[Network.Nodes.Length - 1].Length; nodeIndex++) {
+                double curTarget = target[nodeIndex];
+                double curActual = actual[nodeIndex];
+                Node curNode = Network.Nodes[Network.Nodes.Length - 1][nodeIndex];
 
-                        ConnectionInfluence.Add(con, precalc);
-                    }
+                foreach(Connection toOutputCon in curNode.GetIncommingConnections()) {
+                    double preCalc = CalcOutputInfuence(toOutputCon, curTarget, curActual);
+                    ConnectionInfluence[toOutputCon] = preCalc;
                 }
             }
-            Log("Setup outputs");
 
             //Fill ConnectionInfluence values
-            Parallel.ForEach(ConnectionInfluence.Keys.ToArray(),
+            Parallel.ForEach(AllConnections,
 #if DEBUG
                 new ParallelOptions() { MaxDegreeOfParallelism = 1 }, // When debuggin don't use parallelism
 #endif
                 (con) => GetConnectionInfluence(con));
-
-            Log("Setup other");
 
             //Update weights
             foreach(KeyValuePair<Connection, double?> conInfPair in ConnectionInfluence) {
@@ -71,8 +81,6 @@ namespace NeuralNet.BackpropagationTraining {
                 double deltaWeight = -LearningRate * outputInfluence;
                 conInfPair.Key.Weight += deltaWeight;
             }
-
-            Log("Fix weights");
         }
 
         private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {
