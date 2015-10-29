@@ -90,7 +90,7 @@ namespace Handwriting {
 
         public static Bitmap Resize(this Bitmap image, int width, int height, bool highQuality) {
             var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
+            var destImage = new Bitmap(width, height, image.PixelFormat);
 
             destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
 
@@ -108,6 +108,41 @@ namespace Handwriting {
             }
 
             return destImage;
+        }
+
+        public static double[] GreyValues(this Bitmap bmp) {
+            int bitPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat);
+            var greyVals = new double[bmp.Width * bmp.Height];
+
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
+            unsafe
+            {
+                byte* dataPtr = (byte*)bmpData.Scan0;
+
+                for(var y = 0; y < bmp.Height; y++) {
+                    for(var x = 0; x < bmp.Width; x++) {
+                        var rgbPtr = dataPtr + (x * (bitPerPixel / 8));
+                        int pixTotal = 0;
+
+                        pixTotal += rgbPtr[0];
+                        pixTotal += rgbPtr[1];
+                        pixTotal += rgbPtr[2];
+
+                        if(bitPerPixel == 32) {
+                            pixTotal += rgbPtr[3];
+                        }
+
+                        //level is 0 <--> 255
+                        int greyLevel = pixTotal / (bitPerPixel / 8);
+
+                        greyVals[y * bmp.Height + x] = greyLevel / 255.0;
+                    }
+                    dataPtr += bmpData.Stride;
+                }
+            }
+            bmp.UnlockBits(bmpData);
+
+            return greyVals;
         }
     }
 }
