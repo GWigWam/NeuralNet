@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static NeuralNet.PerformanceLog;
 
 namespace NeuralNet.BackpropagationTraining {
 
@@ -18,23 +19,18 @@ namespace NeuralNet.BackpropagationTraining {
             get;
         }
 
-        public InputExpectedResult[] Expected {
-            get;
-        }
-
         private volatile Dictionary<Connection, double?> ConnectionInfluence;
 
-        public Backpropagate(Network network, InputExpectedResult[] expected, double learningRate = 0.5) {
+        public Backpropagate(Network network, double learningRate = 0.5) {
             Network = network;
-            Expected = expected;
             LearningRate = learningRate;
 
             ConnectionInfluence = new Dictionary<Connection, double?>();
         }
 
-        public void Train() {
-            foreach(var expected in Expected) {
-                AdjustWeights(expected);
+        public void Train(InputExpectedResult[] expected) {
+            foreach(var exp in expected) {
+                AdjustWeights(exp);
             }
         }
 
@@ -58,6 +54,7 @@ namespace NeuralNet.BackpropagationTraining {
                     }
                 }
             }
+            Log("Setup outputs");
 
             //Fill ConnectionInfluence values
             Parallel.ForEach(ConnectionInfluence.Keys.ToArray(),
@@ -66,12 +63,16 @@ namespace NeuralNet.BackpropagationTraining {
 #endif
                 (con) => GetConnectionInfluence(con));
 
+            Log("Setup other");
+
             //Update weights
             foreach(KeyValuePair<Connection, double?> conInfPair in ConnectionInfluence) {
                 double outputInfluence = conInfPair.Value.Value * conInfPair.Key.FromNode.Output;
                 double deltaWeight = -LearningRate * outputInfluence;
                 conInfPair.Key.Weight += deltaWeight;
             }
+
+            Log("Fix weights");
         }
 
         private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {

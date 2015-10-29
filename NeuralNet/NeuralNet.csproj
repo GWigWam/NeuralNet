@@ -68,6 +68,7 @@
     <Compile Include="Network.cs" />
     <Compile Include="Nodes\Input.cs" />
     <Compile Include="Nodes\Perceptron.cs" />
+    <Compile Include="PerformanceLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TransferFunctions\SigmoidFunction.cs" />
     <Compile Include="TransferFunctions\TransferFunction.cs" />

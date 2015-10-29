@@ -30,14 +30,16 @@ namespace IrisSpecies {
             var inputAndExpectedResuls = train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput));
             var validation = data.Skip(TrainSetSize).ToArray();
 
-            var bp = new Backpropagate(network, inputAndExpectedResuls.ToArray(), 0.5);
+            var bp = new Backpropagate(network, 0.5);
+
+            var trainData = inputAndExpectedResuls.ToArray();
 
             int trains = 0;
             double score = 0;
             var start = Environment.TickCount;
             while(score < 90) {
                 trains++;
-                bp.Train();
+                bp.Train(trainData);
 
                 var stats = NetworkValidation.Validate(network, inputAndExpectedResuls, IrisEntry.IsOutputSuccess);
                 score = stats.SuccessPercentage;

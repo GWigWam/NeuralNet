@@ -205,8 +205,8 @@ namespace Test {
 
             var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
 
-            var bp = new Backpropagate(net, new InputExpectedResult[] { expected }, 0.5);
-            bp.Train();
+            var bp = new Backpropagate(net, 0.5);
+            bp.Train(new InputExpectedResult[] { expected });
 
             var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
 

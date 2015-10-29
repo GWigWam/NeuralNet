@@ -68,11 +68,18 @@
   <ItemGroup>
     <Compile Include="ImageHelper.cs" />
     <Compile Include="ImageReader.cs" />
+    <Compile Include="LazyTrainImgLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">
+      <Project>{f494466a-61c9-451f-9971-4cc070bc7f2c}</Project>
+      <Name>NeuralNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
