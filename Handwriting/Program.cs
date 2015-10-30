@@ -15,12 +15,13 @@ namespace Handwriting {
         private const int dimentions = 32;
 
         private static void Main(string[] args) {
-            Log("Start");
+            LogSingle("Start");
             var imgLoader = new LazyTrainImgLoader(dirLoc, true, true, true, dimentions, 100);
 
-            Log("ImageLoader read, create & train network");
+            LogSingle("ImageLoader read, create & train network");
             var network = new Network(new SigmoidFunction(), true);
             network.FillNetwork(dimentions * dimentions, 10, 15);
+            network.RandomizeWeights();
 
             var backpropTraining = new Backpropagate(network, 0.5);
 
@@ -29,9 +30,10 @@ namespace Handwriting {
                 backpropTraining.Train(trainData);
 
                 var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
-                Log($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | " + stats.ToString());
+                LogSingle($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | " + stats.ToString());
+                PrintProcesses(true);
             }
-            Log("Done training");
+            LogSingle("Done training");
 
             Console.ReadKey();
         }

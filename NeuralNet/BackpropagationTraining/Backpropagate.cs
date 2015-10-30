@@ -48,16 +48,18 @@ namespace NeuralNet.BackpropagationTraining {
         }
 
         private void AdjustWeights(InputExpectedResult irp) {
+            ResetCurTimer();
             double[] actual = Network.GetInputResult(irp.Input);
             double[] target = irp.Output;
+
+            LogProcess("Load actual / target");
 
             //Reset influence values option_0
             foreach(var key in AllConnections) {
                 ConnectionInfluence[key] = null;
             }
 
-            //Reset influence value option_1
-            ConnectionInfluence = AllConnections.ToDictionary<Connection, Connection, double?>(c => c, c => null);
+            LogProcess("Reset influence values");
 
             //Set output influence value
             for(int nodeIndex = 0; nodeIndex < Network.Nodes[Network.Nodes.Length - 1].Length; nodeIndex++) {
@@ -71,12 +73,14 @@ namespace NeuralNet.BackpropagationTraining {
                 }
             }
 
+            LogProcess("Set output influence values");
+
             //Fill ConnectionInfluence values
-            Parallel.ForEach(AllConnections,
-#if DEBUG
-                new ParallelOptions() { MaxDegreeOfParallelism = 1 }, // When debuggin don't use parallelism
-#endif
-                (con) => GetConnectionInfluence(con));
+            foreach(Connection connection in AllConnections) {
+                GetConnectionInfluence(connection);
+            }
+
+            LogProcess("Fill ConnectionInfluence values");
 
             //Update weights
             foreach(KeyValuePair<Connection, double?> conInfPair in ConnectionInfluence) {
@@ -84,6 +88,8 @@ namespace NeuralNet.BackpropagationTraining {
                 double deltaWeight = -LearningRate * outputInfluence;
                 conInfPair.Key.Weight += deltaWeight;
             }
+
+            LogProcess("Update weights");
         }
 
         private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {
@@ -109,8 +115,8 @@ namespace NeuralNet.BackpropagationTraining {
                 double outDeriv = Network.TransferFunction.Derivative(connection.ToNode.Output);
 
                 double influence = sumInfluenceOutput * outDeriv;
-
                 ConnectionInfluence[connection] = influence;
+                return influence;
             }
 
             return ConnectionInfluence[connection].Value;
