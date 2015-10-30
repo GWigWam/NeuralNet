@@ -51,10 +51,13 @@ namespace NeuralNet.BackpropagationTraining {
             double[] actual = Network.GetInputResult(irp.Input);
             double[] target = irp.Output;
 
-            //Reset influence values
+            //Reset influence values option_0
             foreach(var key in AllConnections) {
                 ConnectionInfluence[key] = null;
             }
+
+            //Reset influence value option_1
+            ConnectionInfluence = AllConnections.ToDictionary<Connection, Connection, double?>(c => c, c => null);
 
             //Set output influence value
             for(int nodeIndex = 0; nodeIndex < Network.Nodes[Network.Nodes.Length - 1].Length; nodeIndex++) {
