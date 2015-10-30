@@ -1,6 +1,7 @@
 ﻿using NeuralNet.Connections;
 using NeuralNet.Nodes;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,25 +16,30 @@ namespace NeuralNet.BackpropagationTraining {
             get; set;
         }
 
+        public int MicroBatchSize {
+            get;
+        }
+
         public Network Network {
             get;
         }
 
-        private volatile Dictionary<Connection, double?> ConnectionInfluence;
+        private volatile ConcurrentDictionary<Connection, double?[]> ConnectionInfluence;
 
-        private Connection[] AllConnections;
+        private readonly Connection[] AllConnections;
 
-        public Backpropagate(Network network, double learningRate = 0.5) {
+        public Backpropagate(Network network, double learningRate = 0.5, int microBatchSize = 1) {
             Network = network;
             LearningRate = learningRate;
+            MicroBatchSize = microBatchSize;
 
             //Loop trough all network connections and add them to ConnectionInfluence list
-            ConnectionInfluence = new Dictionary<Connection, double?>(/*new Connection.ConnectionComparer()*/);
+            ConnectionInfluence = new ConcurrentDictionary<Connection, double?[]>();
             for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
                 for(int index = 0; index < Network.Nodes[layer].Length; index++) {
                     //Loop trough current nodes incomming connections
                     foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
-                        ConnectionInfluence.Add(con, null);
+                        ConnectionInfluence.TryAdd(con, new double?[MicroBatchSize]);
                     }
                 }
             }
@@ -42,24 +48,39 @@ namespace NeuralNet.BackpropagationTraining {
         }
 
         public void Train(InputExpectedResult[] expected) {
-            foreach(var exp in expected) {
-                AdjustWeights(exp);
+            for(int batchNr = 0; batchNr * MicroBatchSize < expected.Length; batchNr++) {
+                //Reset influence values
+                foreach(var key in AllConnections) {
+                    ConnectionInfluence[key] = new double?[MicroBatchSize];
+                }
+                LogProcess("Reset influence values");
+
+                for(int batchIndex = 0; batchIndex < MicroBatchSize && (batchNr * MicroBatchSize) + batchIndex < expected.Length; batchIndex++) {
+                    AdjustWeights(expected[(batchNr * MicroBatchSize) + batchIndex], batchIndex);
+                }
+
+                Parallel.For(0, MicroBatchSize, (batchIndex) => {
+                    if((batchNr * MicroBatchSize) + batchIndex < expected.Length) {
+                        AdjustWeights(expected[(batchNr * MicroBatchSize) + batchIndex], batchIndex);
+                    }
+                });
+
+                //Update weights
+                foreach(KeyValuePair<Connection, double?[]> conInfPair in ConnectionInfluence) {
+                    double outputInfluence = conInfPair.Value.Sum(d => (d ?? 0) * conInfPair.Key.FromNode.Output);
+                    double deltaWeight = -LearningRate * outputInfluence;
+                    conInfPair.Key.Weight += deltaWeight;
+                }
+                LogProcess("Update weights");
             }
         }
 
-        private void AdjustWeights(InputExpectedResult irp) {
+        private void AdjustWeights(InputExpectedResult irp, int microBatchIndex) {
             ResetCurTimer();
             double[] actual = Network.GetInputResult(irp.Input);
             double[] target = irp.Output;
 
             LogProcess("Load actual / target");
-
-            //Reset influence values option_0
-            foreach(var key in AllConnections) {
-                ConnectionInfluence[key] = null;
-            }
-
-            LogProcess("Reset influence values");
 
             //Set output influence value
             for(int nodeIndex = 0; nodeIndex < Network.Nodes[Network.Nodes.Length - 1].Length; nodeIndex++) {
@@ -69,7 +90,7 @@ namespace NeuralNet.BackpropagationTraining {
 
                 foreach(Connection toOutputCon in curNode.GetIncommingConnections()) {
                     double preCalc = CalcOutputInfuence(toOutputCon, curTarget, curActual);
-                    ConnectionInfluence[toOutputCon] = preCalc;
+                    ConnectionInfluence[toOutputCon][microBatchIndex] = preCalc;
                 }
             }
 
@@ -77,19 +98,10 @@ namespace NeuralNet.BackpropagationTraining {
 
             //Fill ConnectionInfluence values
             foreach(Connection connection in AllConnections) {
-                GetConnectionInfluence(connection);
+                GetConnectionInfluence(connection, microBatchIndex);
             }
 
             LogProcess("Fill ConnectionInfluence values");
-
-            //Update weights
-            foreach(KeyValuePair<Connection, double?> conInfPair in ConnectionInfluence) {
-                double outputInfluence = conInfPair.Value.Value * conInfPair.Key.FromNode.Output;
-                double deltaWeight = -LearningRate * outputInfluence;
-                conInfPair.Key.Weight += deltaWeight;
-            }
-
-            LogProcess("Update weights");
         }
 
         private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {
@@ -102,11 +114,14 @@ namespace NeuralNet.BackpropagationTraining {
         /// Calculates connection influence value IF it is not yet present in ConnectionInfluence dictionary
         /// Stores result in the dictionary and then returns it
         /// </summary>
-        private double GetConnectionInfluence(Connection connection) {
-            if(!ConnectionInfluence[connection].HasValue) {
+        private double GetConnectionInfluence(Connection connection, int microBatchIndex) {
+            double? cur = ConnectionInfluence[connection][microBatchIndex];
+            if(cur.HasValue) {
+                return cur.Value;
+            } else {
                 double sumInfluenceOutput = 0;
                 foreach(var outgoing in connection.ToNode.GetOutgoingConnections()) {
-                    double connectionInfluence = GetConnectionInfluence(outgoing);
+                    double connectionInfluence = GetConnectionInfluence(outgoing, microBatchIndex);
                     double curInfluence = connectionInfluence * outgoing.Weight;
                     sumInfluenceOutput += curInfluence;
                 }
@@ -115,11 +130,9 @@ namespace NeuralNet.BackpropagationTraining {
                 double outDeriv = Network.TransferFunction.Derivative(connection.ToNode.Output);
 
                 double influence = sumInfluenceOutput * outDeriv;
-                ConnectionInfluence[connection] = influence;
+                ConnectionInfluence[connection][microBatchIndex] = influence;
                 return influence;
             }
-
-            return ConnectionInfluence[connection].Value;
         }
     }
 }

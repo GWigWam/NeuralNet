@@ -12,7 +12,7 @@ namespace Handwriting {
 
     public class Program {
         private const string dirLoc = "F:/Zooi/github/NeuralNet/Handwriting/data/img";
-        private const int dimentions = 32;
+        private const int dimentions = 28;
 
         private static void Main(string[] args) {
             LogSingle("Start");
@@ -21,9 +21,9 @@ namespace Handwriting {
             LogSingle("ImageLoader read, create & train network");
             var network = new Network(new SigmoidFunction(), true);
             network.FillNetwork(dimentions * dimentions, 10, 15);
-            network.RandomizeWeights();
+            //network.RandomizeWeights();
 
-            var backpropTraining = new Backpropagate(network, 0.5);
+            var backpropTraining = new Backpropagate(network, 3, 10);
 
             InputExpectedResult[] trainData;
             while((trainData = imgLoader.GetNextBatch()).Length > 0) {

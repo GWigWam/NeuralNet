@@ -14,7 +14,7 @@ namespace IrisSpecies {
         private static Random random = new Random();
 
         private static void Main(string[] args) {
-            var data = DataReader.ReadFromFile("data/iris.data").OrderBy(i => random.Next());
+            var data = DataReader.ReadFromFile("data/iris.data")/*.OrderBy(i => random.Next())*/;
             foreach(var entry in data) {
                 //TODO: it is suboptimal to calculate min and max every time
                 entry.PetalLength = Normalize(entry.PetalLength, data.Min(i => i.PetalLength), data.Max(i => i.PetalLength));
@@ -24,13 +24,13 @@ namespace IrisSpecies {
             }
 
             var network = new Network(new NeuralNet.TransferFunctions.SigmoidFunction(), true);
-            network.FillNetwork(4, 3, 4, 4);
+            network.FillNetwork(4, 3, 6);
 
             var train = data.Take(TrainSetSize).ToArray();
             var inputAndExpectedResuls = train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput));
             var validation = data.Skip(TrainSetSize).ToArray();
 
-            var bp = new Backpropagate(network, 0.5);
+            var bp = new Backpropagate(network, 0.5, 3);
 
             var trainData = inputAndExpectedResuls.ToArray();
 
