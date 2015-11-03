@@ -10,7 +10,9 @@ namespace NeuralNet.TransferFunctions {
 
         public double Calculate(params double[] input) => Calculate((IEnumerable<double>)input);
 
-        public abstract double Calculate(IEnumerable<double> input);
+        public double Calculate(IEnumerable<double> input) => Calculate(input.Sum());
+
+        public abstract double Calculate(double input);
 
         public abstract double Derivative(double input);
     }

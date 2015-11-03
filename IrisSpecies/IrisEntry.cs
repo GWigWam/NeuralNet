@@ -11,6 +11,9 @@ namespace IrisSpecies {
     }
 
     internal class IrisEntry {
+        private int ExtremeMin = -1;
+        private int ExtremeMax = 1;
+
         public double SepalLength;
         public double SepalWidth;
         public double PetalLength;
@@ -18,7 +21,7 @@ namespace IrisSpecies {
         public IrisSpecies Species;
 
         public double[] AsInput => new double[] { SepalLength, SepalWidth, PetalLength, PetalWidth };
-        public double[] AsOutput => (Species == IrisSpecies.Setosa) ? new double[] { 1, 0, 0 } : (Species == IrisSpecies.Versicolor) ? new double[] { 0, 1, 0 } : new double[] { 0, 0, 1 };
+        public double[] AsOutput => (Species == IrisSpecies.Setosa) ? new double[] { ExtremeMax, ExtremeMin, ExtremeMin } : (Species == IrisSpecies.Versicolor) ? new double[] { ExtremeMin, ExtremeMax, ExtremeMin } : new double[] { ExtremeMin, ExtremeMin, ExtremeMax };
 
         public IrisEntry(double sl, double sw, double pl, double pw, IrisSpecies species) {
             SepalLength = sl;

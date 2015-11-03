@@ -23,7 +23,7 @@ namespace IrisSpecies {
                 entry.SepalWidth = Normalize(entry.SepalWidth, data.Min(i => i.SepalWidth), data.Max(i => i.SepalWidth));
             }
 
-            var network = new Network(new NeuralNet.TransferFunctions.SigmoidFunction(), true);
+            var network = new Network(new NeuralNet.TransferFunctions.HyperbolicTangentFunction(), true);
             network.FillNetwork(4, 3, 6);
 
             var train = data.Take(TrainSetSize).ToArray();

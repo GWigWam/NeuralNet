@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace NeuralNet.TransferFunctions {
 
-    public class SigmoidFunction : TransferFunction {
+    public class HyperbolicTangentFunction : TransferFunction {
 
         public override double Calculate(double input) {
-            var val = (1.0 / (1.0 + Math.Pow(Math.E, -input)));
+            var val = Math.Tanh(input);
             return val;
         }
 
         public override double Derivative(double input) {
-            var val = input * (1.0 - input);
+            var val = 1.0 - Math.Pow(Math.Tanh(input), 2);
             return val;
         }
     }
