@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 namespace NeuralNet.TransferFunctions {
 
     public class HyperbolicTangentFunction : TransferFunction {
+        public override double ExtremeMax => 1;
+
+        public override double ExtremeMin => -1;
 
         public override double Calculate(double input) {
             var val = Math.Tanh(input);

@@ -8,6 +8,14 @@ namespace NeuralNet.TransferFunctions {
 
     public abstract class TransferFunction {
 
+        public abstract double ExtremeMax {
+            get;
+        }
+
+        public abstract double ExtremeMin {
+            get;
+        }
+
         public double Calculate(params double[] input) => Calculate((IEnumerable<double>)input);
 
         public double Calculate(IEnumerable<double> input) => Calculate(input.Sum());
