@@ -55,10 +55,6 @@ namespace NeuralNet.BackpropagationTraining {
                 }
                 LogProcess("Reset influence values");
 
-                for(int batchIndex = 0; batchIndex < MicroBatchSize && (batchNr * MicroBatchSize) + batchIndex < expected.Length; batchIndex++) {
-                    AdjustWeights(expected[(batchNr * MicroBatchSize) + batchIndex], batchIndex);
-                }
-
                 Parallel.For(0, MicroBatchSize, (batchIndex) => {
                     if((batchNr * MicroBatchSize) + batchIndex < expected.Length) {
                         AdjustWeights(expected[(batchNr * MicroBatchSize) + batchIndex], batchIndex);

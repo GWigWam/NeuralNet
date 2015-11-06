@@ -15,23 +15,14 @@ namespace NeuralNet {
                 double[] actual = network.GetInputResult(cur.Input);
 
                 double sse = SumSquaredError(cur.Output, actual);
-                double certainty = Certainty(cur.Output, actual);
                 bool success = checkSuccess(cur.Output, actual);
 
-                var res = new ValidationResult(sse, certainty, success);
+                var res = new ValidationResult(sse, success);
 
                 totalResult += res;
             }
 
             return totalResult;
-        }
-
-        public static double Certainty(double[] target, double[] actual) {
-            double dif = 0;
-            for(int i = 0; i < target.Length; i++) {
-                dif += Math.Abs(target[i] - actual[i]);
-            }
-            return 1.0 - (dif / target.Length);
         }
 
         public static double SquaredError(double target, double actual) {
@@ -52,10 +43,8 @@ namespace NeuralNet {
 
     public class ValidationResult {
         private List<double> SSEs;
-        private List<double> Certainties;
 
         public double AvgSSE => SSEs.Count > 0 ? SSEs.Average() : -1;
-        public double AvgCertainty => Certainties.Count > 0 ? Certainties.Average() : -1;
 
         public int EntryCount => SSEs.Count;
 
@@ -67,12 +56,10 @@ namespace NeuralNet {
 
         private ValidationResult() {
             SSEs = new List<double>();
-            Certainties = new List<double>();
         }
 
-        public ValidationResult(double sse, double certainty, bool isSuccess) : this() {
+        public ValidationResult(double sse, bool isSuccess) : this() {
             SSEs.Add(sse);
-            Certainties.Add(certainty);
 
             if(isSuccess) {
                 Successes++;
@@ -83,21 +70,15 @@ namespace NeuralNet {
             return SSEs.ToArray();
         }
 
-        public double[] GetCertainties() {
-            return Certainties.ToArray();
-        }
-
         public static ValidationResult operator +(ValidationResult v1, ValidationResult v2) {
             var retVal = new ValidationResult();
 
             if(v1 != null) {
                 retVal.SSEs.AddRange(v1.SSEs);
-                retVal.Certainties.AddRange(v1.Certainties);
                 retVal.Successes += v1.Successes;
             }
             if(v2 != null) {
                 retVal.SSEs.AddRange(v2.SSEs);
-                retVal.Certainties.AddRange(v2.Certainties);
                 retVal.Successes += v2.Successes;
             }
 
@@ -105,7 +86,7 @@ namespace NeuralNet {
         }
 
         public override string ToString() {
-            return $"Avg SSE: {AvgSSE:N3} | Avg certainty: {AvgCertainty:N3} | {SuccessPercentage:N1}% Correct";
+            return $"Avg SSE: {AvgSSE:N5} | {SuccessPercentage:N1}% Correct";
         }
     }
 }
