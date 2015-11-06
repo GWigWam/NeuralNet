@@ -110,7 +110,7 @@ namespace Handwriting {
             return destImage;
         }
 
-        public static double[] GreyValues(this Bitmap bmp) {
+        public static double[] GreyValues(this Bitmap bmp, double min, double max) {
             int bitPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat);
             var greyVals = new double[bmp.Width * bmp.Height];
 
@@ -135,7 +135,7 @@ namespace Handwriting {
                         //level is 0 <--> 255
                         int greyLevel = pixTotal / (bitPerPixel / 8);
 
-                        greyVals[y * bmp.Height + x] = greyLevel / 255.0;
+                        greyVals[y * bmp.Height + x] = NeuralNet.MathHelper.ShiftRange(greyLevel, 0, 255, min, max);
                     }
                     dataPtr += bmpData.Stride;
                 }

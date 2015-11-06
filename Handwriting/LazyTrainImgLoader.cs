@@ -1,4 +1,5 @@
 ﻿using NeuralNet;
+using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -49,11 +50,16 @@ namespace Handwriting {
 
         private volatile int curIndex = 0;
 
+        private TransferFunction Transfer {
+            get;
+        }
+
         public int Index => curIndex;
         public int FileCount => Files.Length;
 
-        public LazyTrainImgLoader(string dirLoc, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions, int batchSize) {
+        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions, int batchSize) {
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
+            Transfer = transfer;
             OnlyNumbers = onlyNumbers;
             CropWhitespace = cropWhitespace;
             HighQuality = highQuality;
@@ -77,6 +83,11 @@ namespace Handwriting {
             return ret;
         }
 
+        public void ResetIndex() {
+            curIndex = 0;
+            StartPreLoad();
+        }
+
         private IEnumerable<Tuple<FileInfo, char>> GenFileList(string dirLoc) {
             var FileFormat = new Regex(@"_(?<char>[^_]+)_[A-Z0-9]+?.bmp$");
 
@@ -86,18 +97,22 @@ namespace Handwriting {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
                 char curChar;
                 if(char.TryParse(readChar, out curChar) && (!OnlyNumbers || char.IsNumber(curChar))) {
-                    yield return new Tuple<FileInfo, char>(file, curChar);
+                    if(curChar == '1' || curChar == '8') {
+                        yield return new Tuple<FileInfo, char>(file, curChar);
+                    }
                 }
             }
         }
 
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
-            double[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimentions).GreyValues();
+            double[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimentions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
             if(OnlyNumbers) {
                 var nr = int.Parse(data.Item2.ToString());
                 var outp = new double[10];
-                outp[nr] = 1;
+                for(int i = 0; i < outp.Length; i++) {
+                    outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
+                }
 
                 return new InputExpectedResult(inp, outp);
             } else {
