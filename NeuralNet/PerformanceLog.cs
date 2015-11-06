@@ -25,18 +25,26 @@ namespace NeuralNet {
             ThreadLastLog.AddOrUpdate(Thread.CurrentThread.ManagedThreadId, Environment.TickCount, (i, l) => Environment.TickCount);
         }
 
-        public static void LogSingle(string s) {
-            Console.WriteLine($"{Environment.TickCount - LastLog,-5}Ms | {s}");
-            ResetCurTimer();
+        public static void LogSingle(string msg, bool logTime, ConsoleColor? fontColor = null, ConsoleColor? backColor = null) {
+            var dutation = Environment.TickCount - LastLog;
+
+            var startFontColor = Console.ForegroundColor;
+            var startBackColor = Console.BackgroundColor;
+            Console.ForegroundColor = fontColor ?? startFontColor;
+            Console.BackgroundColor = backColor ?? startBackColor;
+
+            if(logTime) {
+                Console.WriteLine($"{dutation,-5}Ms | {msg}");
+                ResetCurTimer();
+            } else {
+                Console.WriteLine(msg);
+            }
+
+            Console.ForegroundColor = startFontColor;
+            Console.BackgroundColor = startBackColor;
         }
 
         public static void LogProcess(string name) {
-            /*if(Processes.ContainsKey(name)) {
-                Processes[name] += (Environment.TickCount - LastLog);
-            } else {
-                Processes.TryAdd(name, Environment.TickCount - LastLog);
-            }*/
-
             var duration = Environment.TickCount - LastLog;
 
             Processes.AddOrUpdate(name, duration, (s, l) => l + duration);

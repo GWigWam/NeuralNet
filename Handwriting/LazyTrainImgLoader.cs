@@ -73,7 +73,7 @@ namespace Handwriting {
 
         public InputExpectedResult[] GetNextBatch() {
             if(Loading) {
-                PerformanceLog.LogSingle("Next batch requested, but not yet done loading");
+                PerformanceLog.LogSingle("Next batch requested, but not yet done loading", true, ConsoleColor.White, ConsoleColor.Red);
                 PreLoadTask.Wait();
             }
 
