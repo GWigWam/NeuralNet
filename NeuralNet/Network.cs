@@ -50,7 +50,6 @@ namespace NeuralNet {
                 int height = nonInputLayers[layerIndex - 1];
 
                 var curLayer = new List<Perceptron>(height);
-                double connectionWeight = 1.0 / Nodes[layerIndex - 1].Length; //1 div by Prev layer length
                 for(int percNr = 0; percNr < height; percNr++) {
                     //Create perceptron
                     string name = layerIndex == Nodes.Length - 1 ? $"Output {percNr}" : $"Hidden #{layerIndex - 1}.{percNr}";
@@ -58,7 +57,11 @@ namespace NeuralNet {
 
                     //Create input connections
                     foreach(var inp in Nodes[layerIndex - 1]) {
-                        Connection.Create(connectionWeight, inp, newPerceptron);
+                        double weight = 0;
+                        if(layerIndex - 1 == 0) { //Input --> 1st hidden
+                            weight = MathHelper.GuassianRandom(Math.Sqrt(1.0 / 3.0), 0);
+                        }
+                        Connection.Create(weight, inp, newPerceptron);
                     }
 
                     if(Bias != null) {
