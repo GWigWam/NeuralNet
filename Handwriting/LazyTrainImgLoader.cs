@@ -97,9 +97,7 @@ namespace Handwriting {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
                 char curChar;
                 if(char.TryParse(readChar, out curChar) && (!OnlyNumbers || char.IsNumber(curChar))) {
-                    if(curChar == '1' || curChar == '8') {
-                        yield return new Tuple<FileInfo, char>(file, curChar);
-                    }
+                    yield return new Tuple<FileInfo, char>(file, curChar);
                 }
             }
         }

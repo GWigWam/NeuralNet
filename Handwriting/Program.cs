@@ -14,7 +14,7 @@ namespace Handwriting {
         private static readonly Random random = new Random();
 
         //Transfer function
-        private static readonly TransferFunction transfer = new SigmoidFunction();
+        private static readonly TransferFunction transfer = new HyperbolicTangentFunction();
 
         //Consts
         private static readonly int[] HiddenLayerHeights = new int[] { 30 };
