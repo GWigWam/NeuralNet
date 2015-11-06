@@ -7,6 +7,8 @@ using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Test {
 
@@ -211,6 +213,32 @@ namespace Test {
             var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
 
             Assert.IsTrue(before.AvgSSE > after.AvgSSE);
+        }
+
+        [TestMethod]
+        public void TestParallelLogging() {
+            Task t1 = new Task(() => {
+                PerformanceLog.ResetCurTimer();
+                Task.Delay(1000).Wait();
+                PerformanceLog.LogProcess("1");
+                Task.Delay(300).Wait();
+                PerformanceLog.LogProcess("2");
+            });
+
+            Task t2 = new Task(() => {
+                PerformanceLog.ResetCurTimer();
+                Task.Delay(1100).Wait();
+                PerformanceLog.LogProcess("1");
+            });
+
+            t1.Start();
+            t2.Start();
+
+            t1.Wait();
+            t2.Wait();
+
+            Assert.IsTrue(PerformanceLog.Processes["1"] >= 2100);
+            Assert.IsTrue(PerformanceLog.Processes["2"] >= 300);
         }
     }
 }
