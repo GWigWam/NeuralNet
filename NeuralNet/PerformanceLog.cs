@@ -1,36 +1,46 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NeuralNet {
 
     public static class PerformanceLog {
-        private static long lastLog;
+        private static ConcurrentDictionary<int, long> ThreadLastLog;
 
-        private static Dictionary<string, long> Processes;
+        public static ConcurrentDictionary<string, long> Processes;
+
+        private static long LastLog => ThreadLastLog[Thread.CurrentThread.ManagedThreadId];
 
         static PerformanceLog() {
+            Processes = new ConcurrentDictionary<string, long>();
+            ThreadLastLog = new ConcurrentDictionary<int, long>();
             ResetCurTimer();
-            Processes = new Dictionary<string, long>();
         }
 
         public static void ResetCurTimer() {
-            lastLog = Environment.TickCount;
+            ThreadLastLog.AddOrUpdate(Thread.CurrentThread.ManagedThreadId, Environment.TickCount, (i, l) => Environment.TickCount);
         }
 
         public static void LogSingle(string s) {
-            Console.WriteLine($"{Environment.TickCount - lastLog,-5}Ms | {s}");
+            Console.WriteLine($"{Environment.TickCount - LastLog,-5}Ms | {s}");
             ResetCurTimer();
         }
 
         public static void LogProcess(string name) {
-            if(Processes.ContainsKey(name)) {
-                Processes[name] += (Environment.TickCount - lastLog);
+            /*if(Processes.ContainsKey(name)) {
+                Processes[name] += (Environment.TickCount - LastLog);
             } else {
-                Processes.Add(name, Environment.TickCount - lastLog);
-            }
+                Processes.TryAdd(name, Environment.TickCount - LastLog);
+            }*/
+
+            var duration = Environment.TickCount - LastLog;
+
+            Processes.AddOrUpdate(name, duration, (s, l) => l + duration);
+
             ResetCurTimer();
         }
 
@@ -49,7 +59,7 @@ namespace NeuralNet {
         }
 
         public static void ResetProcesses() {
-            Processes = new Dictionary<string, long>();
+            Processes = new ConcurrentDictionary<string, long>();
         }
     }
 }
