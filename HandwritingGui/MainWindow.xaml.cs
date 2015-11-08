@@ -20,28 +20,27 @@ namespace HandwritingGui {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-        private readonly Regex uintRegex = new Regex("^[0-9]+$");
-        private readonly Regex udoubleRegex = new Regex("^[0-9.]+$");
+        private readonly Regex UIntRegex = new Regex("^[0-9]+$");
+        private readonly Regex UDoubleRegex = new Regex("^[0-9.]+$");
+        private string PrevNetworkDimText;
 
         public MainWindow() {
             InitializeComponent();
+            PrevNetworkDimText = Tb_NetworkDimensions.Text;
         }
 
         private void PreviewUnsignedIntTb(object sender, TextCompositionEventArgs e) {
-            e.Handled = !uintRegex.IsMatch(e.Text);
+            e.Handled = !UIntRegex.IsMatch(e.Text);
         }
 
         private void PreviewPositiveDoubleTb(object sender, TextCompositionEventArgs e) {
-            e.Handled = !udoubleRegex.IsMatch(e.Text);
+            e.Handled = !UDoubleRegex.IsMatch(e.Text);
         }
 
         private void Bt_SetupReady_Click(object sender, RoutedEventArgs e) {
         }
 
         private void Bt_ImgPath_Browse_Click(object sender, RoutedEventArgs e) {
-        }
-
-        private void Tb_NetworkDimensions_PreviewTextInput(object sender, TextCompositionEventArgs e) {
         }
 
         private void Tb_ImgDimensions_TextChanged(object sender, TextChangedEventArgs e) {

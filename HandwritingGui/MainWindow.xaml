@@ -59,9 +59,9 @@
                     </StackPanel>
                     <!--Network dimensions-->
                     <Label Content="Network Dimensions:" Grid.Column="0" Grid.Row="6" />
-                    <TextBox x:Name="Tb_NetworkDimensions" Grid.Column="1" Grid.Row="6" Text="X*X*X" Margin="2" PreviewTextInput="Tb_NetworkDimensions_PreviewTextInput" />
+                    <TextBox x:Name="Tb_NetworkDimensions" Grid.Column="1" Grid.Row="6" Text="X*X*X" Margin="2" />
                     <!--Ok button-->
-                    <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="6" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
+                    <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="7" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="TBt_Train">
