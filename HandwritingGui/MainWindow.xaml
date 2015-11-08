@@ -1,0 +1,65 @@
+﻿<Window x:Class="HandwritingGui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HandwritingGui"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="600" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
+            <TabItem x:Name="TBt_Setup">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <!--ImgDimentions-->
+                    <Label Content="Image Dimentions:" Grid.Column="0" Grid.Row="0" />
+                    <TextBox x:Name="Tb_ImgDimentions" Grid.Column="1" Grid.Row="0" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" />
+                    <!--Learning rate-->
+                    <Label Content="Learning Rate:" Grid.Column="0" Grid.Row="1" />
+                    <TextBox x:Name="Tb_LearnRate" Grid.Column="1" Grid.Row="1" Margin="2" PreviewTextInput="PreviewPositiveDoubleTb" />
+                    <!--Microbatch size-->
+                    <Label Content="Microbatch Size:" Grid.Column="0" Grid.Row="2" />
+                    <TextBox x:Name="Tb_MicroBatchSize" Grid.Column="1" Grid.Row="2" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" />
+                    <!--Loadbatch size-->
+                    <Label Content="Loading Batchsize:" Grid.Column="0" Grid.Row="3" />
+                    <TextBox x:Name="Tb_LoadBatchSize" Grid.Column="1" Grid.Row="3" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" />
+                    <!--Img folder-->
+                    <Label Content="Image Folder Path:" Grid.Column="0" Grid.Row="4" />
+                    <Grid Grid.Column="1" Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="9*" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="Tb_ImgPath" Grid.Column="0" Margin="2" />
+                        <Button x:Name="Bt_ImgPath_Browse" Content="Browse" Grid.Column="1" Margin="2" />
+                    </Grid>
+                    <!--Network dimentions-->
+                    <Label Content="Network Dimentions:" Grid.Column="0" Grid.Row="5" />
+                    <TextBox x:Name="Tb_NetworkDimentions" Grid.Column="1" Grid.Row="5" Text="X*X*X" Margin="2" />
+                    <!--Ok button-->
+                    <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="6" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="TBt_Train">
+                <Button Content="Test456" />
+            </TabItem>
+        </TabControl>
+        <TextBox x:Name="Tb_Out" Text="Tb_Out" Grid.Row="1" FontFamily="Consolas" FontSize="13.333" AcceptsReturn="True" Background="Black" Foreground="Green" IsReadOnly="True" />
+    </Grid>
+</Window>
