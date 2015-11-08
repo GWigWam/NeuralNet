@@ -8,7 +8,7 @@
         Title="MainWindow" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*" />
+            <RowDefinition Height="3*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
         <TabControl Grid.Row="0">
@@ -68,6 +68,13 @@
                 <Button Content="Test456" />
             </TabItem>
         </TabControl>
-        <TextBox x:Name="Tb_Out" Text="Tb_Out" Grid.Row="1" FontFamily="Consolas" FontSize="13.333" AcceptsReturn="True" Background="Black" Foreground="Green" IsReadOnly="True" />
+        <RichTextBox x:Name="Rtb_Out" Grid.Row="1" FontFamily="Consolas" FontSize="13.333" Background="Black" Foreground="Green" IsReadOnly="True">
+            <RichTextBox.Resources>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0" />
+                </Style>
+            </RichTextBox.Resources>
+            <FlowDocument />
+        </RichTextBox>
     </Grid>
 </Window>

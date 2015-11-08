@@ -24,9 +24,21 @@ namespace HandwritingGui {
         private readonly Regex UDoubleRegex = new Regex("^[0-9.]+$");
         private string PrevNetworkDimText;
 
+        private BlockCollection Output;
+
         public MainWindow() {
             InitializeComponent();
             PrevNetworkDimText = Tb_NetworkDimensions.Text;
+            Output = Rtb_Out.Document.Blocks;
+
+            Log("UI init complete!");
+        }
+
+        public void Log(string msg, Color? foreground = null, Color? background = null) {
+            var foreBrush = foreground != null ? new SolidColorBrush(foreground.Value) : Rtb_Out.Foreground;
+            var backBrush = background != null ? new SolidColorBrush(background.Value) : Rtb_Out.Background;
+
+            Output.Add(new Paragraph(new Run(msg) { Foreground = foreBrush, Background = backBrush }));
         }
 
         private void PreviewUnsignedIntTb(object sender, TextCompositionEventArgs e) {
@@ -48,6 +60,8 @@ namespace HandwritingGui {
             string replacement = "X*";
             if(int.TryParse(Tb_ImgDimensions.Text, out dim) && dim < Math.Sqrt(double.MaxValue) - 1) {
                 replacement = Math.Pow(dim, 2) + "*";
+            } else {
+                Log("Could not update network dimentions", Colors.WhiteSmoke, Colors.OrangeRed);
             }
             Tb_NetworkDimensions.Text = new Regex(@"^[0-9,X]+(E\+\d+)?\*").Replace(Tb_NetworkDimensions.Text, replacement);
         }
