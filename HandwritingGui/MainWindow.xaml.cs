@@ -40,5 +40,23 @@ namespace HandwritingGui {
 
         private void Bt_ImgPath_Browse_Click(object sender, RoutedEventArgs e) {
         }
+
+        private void Tb_NetworkDimentions_PreviewTextInput(object sender, TextCompositionEventArgs e) {
+        }
+
+        private void Tb_ImgDimentions_TextChanged(object sender, TextChangedEventArgs e) {
+            int dim;
+            string replacement = "X*";
+            if(int.TryParse(Tb_ImgDimentions.Text, out dim) && dim < Math.Sqrt(double.MaxValue) - 1) {
+                replacement = Math.Pow(dim, 2) + "*";
+            }
+            Tb_NetworkDimentions.Text = new Regex(@"^[0-9,X]+(E\+\d+)?\*").Replace(Tb_NetworkDimentions.Text, replacement);
+        }
+
+        private void Rb_Charset_Checked(object sender, RoutedEventArgs e) {
+            if(IsInitialized) {
+                Tb_NetworkDimentions.Text = new Regex(@"\*(\d+|X)$").Replace(Tb_NetworkDimentions.Text, "*" + ((string)((RadioButton)sender).Tag));
+            }
+        }
     }
 }
