@@ -28,9 +28,9 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <!--ImgDimentions-->
-                    <Label Content="Image Dimentions:" Grid.Column="0" Grid.Row="0" />
-                    <TextBox x:Name="Tb_ImgDimentions" Grid.Column="1" Grid.Row="0" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" TextChanged="Tb_ImgDimentions_TextChanged" />
+                    <!--ImgDimensions-->
+                    <Label Content="Image Dimensions:" Grid.Column="0" Grid.Row="0" />
+                    <TextBox x:Name="Tb_ImgDimensions" Grid.Column="1" Grid.Row="0" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" TextChanged="Tb_ImgDimensions_TextChanged" />
                     <!--Learning rate-->
                     <Label Content="Learning Rate:" Grid.Column="0" Grid.Row="1" />
                     <TextBox x:Name="Tb_LearnRate" Grid.Column="1" Grid.Row="1" Margin="2" PreviewTextInput="PreviewPositiveDoubleTb" />
@@ -57,9 +57,9 @@
                         <RadioButton x:Name="Rb_Charset_Alphabetic" Tag="26" Content="Alphabetic" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
                         <RadioButton x:Name="Rb_Charset_All" Tag="36" Content="All" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
                     </StackPanel>
-                    <!--Network dimentions-->
-                    <Label Content="Network Dimentions:" Grid.Column="0" Grid.Row="6" />
-                    <TextBox x:Name="Tb_NetworkDimentions" Grid.Column="1" Grid.Row="6" Text="X*X*X" Margin="2" PreviewTextInput="Tb_NetworkDimentions_PreviewTextInput" />
+                    <!--Network dimensions-->
+                    <Label Content="Network Dimensions:" Grid.Column="0" Grid.Row="6" />
+                    <TextBox x:Name="Tb_NetworkDimensions" Grid.Column="1" Grid.Row="6" Text="X*X*X" Margin="2" PreviewTextInput="Tb_NetworkDimensions_PreviewTextInput" />
                     <!--Ok button-->
                     <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="6" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
                 </Grid>

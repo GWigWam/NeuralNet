@@ -30,7 +30,7 @@ namespace Handwriting {
             get;
         }
 
-        public int Dimentions {
+        public int Dimensions {
             get;
         }
 
@@ -57,13 +57,13 @@ namespace Handwriting {
         public int Index => curIndex;
         public int FileCount => Files.Length;
 
-        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimentions, int batchSize) {
+        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool onlyNumbers, bool cropWhitespace, bool highQuality, int dimensions, int batchSize) {
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
             Transfer = transfer;
             OnlyNumbers = onlyNumbers;
             CropWhitespace = cropWhitespace;
             HighQuality = highQuality;
-            Dimentions = dimentions;
+            Dimensions = dimensions;
             BatchSize = batchSize;
 
             Files = GenFileList(dirLoc).ToArray();
@@ -103,7 +103,7 @@ namespace Handwriting {
         }
 
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
-            double[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimentions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
+            double[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
             if(OnlyNumbers) {
                 var nr = int.Parse(data.Item2.ToString());

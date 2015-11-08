@@ -13,14 +13,14 @@ namespace Handwriting {
 
     public static class ImageReader {
 
-        public static Bitmap ReadImg(string imgLoc, bool cropWhitespace, bool highQuality, int dimentions) {
+        public static Bitmap ReadImg(string imgLoc, bool cropWhitespace, bool highQuality, int dimensions) {
             Bitmap img = (Bitmap)Image.FromFile(imgLoc);
 
             if(cropWhitespace)
                 img = img.CropWhitespace();
 
             img = img.Square();
-            img = img.Resize(dimentions, dimentions, highQuality);
+            img = img.Resize(dimensions, dimensions, highQuality);
 
             return img;
         }

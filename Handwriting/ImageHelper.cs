@@ -72,15 +72,15 @@ namespace Handwriting {
         }
 
         public static Bitmap Square(this Bitmap image) {
-            var dimentions = image.Width > image.Height ? image.Width : image.Height;
+            var dimensions = image.Width > image.Height ? image.Width : image.Height;
 
-            var squareImg = new Bitmap(dimentions, dimentions, image.PixelFormat);
+            var squareImg = new Bitmap(dimensions, dimensions, image.PixelFormat);
 
             using(var graphics = Graphics.FromImage(squareImg)) {
                 graphics.Clear(Color.White);
 
-                int x = (dimentions - image.Width) / 2;
-                int y = (dimentions - image.Height) / 2;
+                int x = (dimensions - image.Width) / 2;
+                int y = (dimensions - image.Height) / 2;
 
                 graphics.DrawImageUnscaled(image, x, y);
             }
