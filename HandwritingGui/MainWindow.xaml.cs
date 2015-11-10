@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNet.TransferFunctions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,10 +28,13 @@ namespace HandwritingGui {
 
         private BlockCollection Output;
 
+        private NetworkGuiLink Network;
+
         public MainWindow() {
             InitializeComponent();
             PrevNetworkDimText = Tb_NetworkDimensions.Text;
             Output = Rtb_Out.Document.Blocks;
+            Network = new NetworkGuiLink();
 
             Log("UI init complete!");
         }
@@ -88,7 +92,8 @@ namespace HandwritingGui {
                 return;
             }
 
-            if(!Directory.Exists(Tb_ImgPath.Text)) {
+            string imgPath = Tb_ImgPath.Text;
+            if(!Directory.Exists(imgPath)) {
                 Log("Invalid image folder path", Colors.Red);
                 return;
             }
@@ -98,7 +103,8 @@ namespace HandwritingGui {
                 Log("Invalid network dimension, invalid format", Colors.Red);
                 return;
             }
-            if(match.Groups?["inp"].Value != Math.Pow(imgDim, 2).ToString()) {
+            int inputHeight;
+            if(!int.TryParse(match.Groups?["inp"].Value, out inputHeight) || inputHeight != Math.Pow(imgDim, 2)) {
                 Log("Invalid network dimension: Input", Colors.Red);
                 return;
             }
@@ -108,7 +114,12 @@ namespace HandwritingGui {
                 return;
             }
 
-            int?[] hiddenHeights = match.Groups?["hid"].Value.TrimEnd('*').Split('*').Select<string, int?>(h => {
+            List<string> hidCaptures = new List<string>();
+            foreach(Capture hidCapture in match.Groups?["hid"].Captures) {
+                hidCaptures.Add(hidCapture.Value.TrimEnd('*'));
+            }
+
+            int?[] hiddenHeights = hidCaptures.Select<string, int?>(h => {
                 int outp;
                 if(int.TryParse(h, out outp))
                     return outp;
@@ -121,6 +132,10 @@ namespace HandwritingGui {
             }
 
             Log("All input seems to be valid", Colors.White, Colors.Green);
+
+            var transFunc = Rb_TFunc_HyperTan.IsChecked ?? false ? TransferFunctionType.HyperbolicTangent : TransferFunctionType.Sigmoid;
+
+            Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray());
         }
 
         private void Tb_ImgDimensions_TextChanged(object sender, TextChangedEventArgs e) {

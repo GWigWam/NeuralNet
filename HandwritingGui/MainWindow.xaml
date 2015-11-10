@@ -27,6 +27,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <!--ImgDimensions-->
                     <Label Content="Image Dimensions:" Grid.Column="0" Grid.Row="0" />
@@ -57,11 +58,17 @@
                         <RadioButton x:Name="Rb_Charset_Alphabetic" Tag="26" Content="Alphabetic" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
                         <RadioButton x:Name="Rb_Charset_All" Tag="36" Content="All" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
                     </StackPanel>
+                    <!--Transfer function-->
+                    <Label Content="Transer Function:" Grid.Column="0" Grid.Row="6" />
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="6">
+                        <RadioButton x:Name="Rb_TFunc_Sigmoid" Content="Sigmoid" VerticalAlignment="Center" Margin="2" GroupName="TFunc" IsChecked="True" />
+                        <RadioButton x:Name="Rb_TFunc_HyperTan" Content="Hyperbolic Tangent" VerticalAlignment="Center" Margin="2" GroupName="TFunc" />
+                    </StackPanel>
                     <!--Network dimensions-->
-                    <Label Content="Network Dimensions:" Grid.Column="0" Grid.Row="6" />
-                    <TextBox x:Name="Tb_NetworkDimensions" Grid.Column="1" Grid.Row="6" Text="X*X*X" Margin="2" />
+                    <Label Content="Network Dimensions:" Grid.Column="0" Grid.Row="7" />
+                    <TextBox x:Name="Tb_NetworkDimensions" Grid.Column="1" Grid.Row="7" Text="X*X*X" Margin="2" />
                     <!--Ok button-->
-                    <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="7" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
+                    <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="8" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
                 </Grid>
             </TabItem>
             <TabItem x:Name="TBt_Train">
