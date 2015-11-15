@@ -35,6 +35,7 @@ namespace HandwritingGui {
             PrevNetworkDimText = Tb_NetworkDimensions.Text;
             Output = Rtb_Out.Document.Blocks;
             Network = new NetworkGuiLink();
+            DataContext = Network;
 
             Log("UI init complete!");
         }

@@ -1,4 +1,5 @@
-﻿using NeuralNet;
+﻿using HandwritingGui.PlotModels;
+using NeuralNet;
 using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;
 using System;
@@ -15,7 +16,10 @@ namespace HandwritingGui {
         private Network Network;
         private Backpropagate BackpropTrain;
 
+        public StatsOverTimeModel StatsOverTime { get; private set; }
+
         public NetworkGuiLink() {
+            StatsOverTime = new StatsOverTimeModel();
         }
 
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
