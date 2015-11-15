@@ -12,8 +12,8 @@
             <RowDefinition Height="3*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <TabControl Grid.Row="0">
-            <TabItem x:Name="TBt_Setup">
+        <TabControl x:Name="TC_Tabs" Grid.Row="0">
+            <TabItem x:Name="TBt_Setup" IsEnabled="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200" />
@@ -72,7 +72,7 @@
                     <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="8" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
                 </Grid>
             </TabItem>
-            <TabItem x:Name="TBt_Train">
+            <TabItem x:Name="TBt_Train" IsEnabled="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="3*" />

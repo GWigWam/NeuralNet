@@ -11,7 +11,10 @@ namespace HandwritingGui.PlotModels {
 
     public class StatsOverTimeModel {
         private LineSeries SSE;
+        private List<DataPoint> SSEData => (List<DataPoint>)SSE.ItemsSource;
+
         private LineSeries PercentSuccess;
+        private List<DataPoint> PercentSuccessData => (List<DataPoint>)PercentSuccess.ItemsSource;
 
         public StatsOverTimeModel() {
             Model = new PlotModel();
@@ -27,6 +30,26 @@ namespace HandwritingGui.PlotModels {
 
             Model.Series.Add(SSE);
             Model.Series.Add(PercentSuccess);
+        }
+
+        public void AddSSE(double sse, bool update = true) {
+            SSEData.Add(new DataPoint(SSEData.Count - 1, sse));
+            if(update) {
+                Model.InvalidatePlot(true);
+            }
+        }
+
+        public void AddSuccessPercent(double perc, bool update = true) {
+            PercentSuccessData.Add(new DataPoint(PercentSuccessData.Count - 1, perc));
+            if(update) {
+                Model.InvalidatePlot(true);
+            }
+        }
+
+        public void AddBoth(double sse, double perc) {
+            AddSSE(sse, false);
+            AddSuccessPercent(perc, false);
+            Model.InvalidatePlot(true);
         }
 
         public PlotModel Model {
