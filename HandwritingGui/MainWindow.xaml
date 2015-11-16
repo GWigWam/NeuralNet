@@ -75,7 +75,7 @@
             <TabItem x:Name="TBt_Train" IsEnabled="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="2*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -83,6 +83,14 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <oxy:PlotView Grid.Row="0" Grid.Column="0"  Model="{Binding StatsOverTime.Model}" />
+                    <Grid Grid.Row="0" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="9*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <oxy:PlotView Model="{Binding SSEHist.Model}" Grid.Row="0" />
+                        <Slider Grid.Row="1" Margin="2" Minimum="1" Maximum="30" SmallChange="1" LargeChange="10" Value="{Binding SSEHist.BarCount}" TickPlacement="BottomRight" />
+                    </Grid>
                 </Grid>
             </TabItem>
         </TabControl>

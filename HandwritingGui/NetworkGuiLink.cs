@@ -20,10 +20,12 @@ namespace HandwritingGui {
         private volatile bool Training = false;
 
         public StatsOverTimeModel StatsOverTime { get; private set; }
+        public SSEHistModel SSEHist { get; private set; }
 
         public NetworkGuiLink() {
             RNG = new Random();
             StatsOverTime = new StatsOverTimeModel();
+            SSEHist = new SSEHistModel();
         }
 
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
@@ -56,6 +58,7 @@ namespace HandwritingGui {
             while(Training) {
                 var trainData = ImgLoader.GetNextBatch();
                 if(trainData.Length < 1) {
+                    //End of epoch
                     ImgLoader.ResetIndex();
                     trainData = ImgLoader.GetNextBatch();
                 }
@@ -64,6 +67,7 @@ namespace HandwritingGui {
 
                 var stats = NetworkValidation.Validate(Network, trainData, IsImgRecogSuccess);
                 StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
+                SSEHist.Update(stats.GetSSEs());
             }
         }
 

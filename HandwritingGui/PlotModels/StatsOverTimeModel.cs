@@ -22,14 +22,20 @@ namespace HandwritingGui.PlotModels {
             Model.Axes.Add(new LinearAxis() { Key = "SSE", Position = AxisPosition.Left, Title = "SSE" });
             Model.Axes.Add(new LinearAxis() { Key = "Suc", Position = AxisPosition.Right, Title = "Success %", Minimum = 0, Maximum = 100, MinorStep = 1 });
 
-            SSE = new LineSeries() { YAxisKey = "SSE" };
+            SSE = new LineSeries() { YAxisKey = "SSE", Title = "SSE" };
             SSE.ItemsSource = new List<DataPoint>();
 
-            PercentSuccess = new LineSeries() { YAxisKey = "Suc" };
+            PercentSuccess = new LineSeries() { YAxisKey = "Suc", Title = "Success %" };
             PercentSuccess.ItemsSource = new List<DataPoint>();
 
             Model.Series.Add(SSE);
             Model.Series.Add(PercentSuccess);
+
+            Model.LegendOrientation = LegendOrientation.Vertical;
+            Model.LegendPlacement = LegendPlacement.Inside;
+            Model.LegendPosition = LegendPosition.TopRight;
+            Model.LegendBorder = OxyColors.Black;
+            Model.LegendTitle = "Over time";
         }
 
         public void AddSSE(double sse, bool update = true) {
