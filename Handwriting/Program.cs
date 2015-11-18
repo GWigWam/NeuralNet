@@ -17,9 +17,9 @@ namespace Handwriting {
         private static readonly TransferFunction transfer = new HyperbolicTangentFunction();
 
         //Consts
-        private static readonly int[] HiddenLayerHeights = new int[] { 10 };
+        private static readonly int[] HiddenLayerHeights = new int[] { 30 };
 
-        private const int ImgDimentions = 16;
+        private const int ImgDimensions = 16;
         private const double LearningRate = 0.001;
         private const int MicroBatchSize = 10;
         private const int LoadBatchSize = 300;
@@ -29,13 +29,13 @@ namespace Handwriting {
 
         private static void Main(string[] args) {
             LogSingle("Start", false, ConsoleColor.White, ConsoleColor.Red);
-            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, true, ImgDimentions, LoadBatchSize);
+            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, true, ImgDimensions, LoadBatchSize);
 
             InputExpectedResult[] validateSet = imgLoader.GetNextBatch();
 
             LogSingle("ImageLoader read, create & train network", true);
             var network = new Network(transfer, true);
-            network.FillNetwork(ImgDimentions * ImgDimentions, 10, HiddenLayerHeights);
+            network.FillNetwork(ImgDimensions * ImgDimensions, 10, HiddenLayerHeights);
 
             var backpropTraining = new Backpropagate(network, LearningRate, MicroBatchSize);
 
@@ -51,7 +51,7 @@ namespace Handwriting {
                     LogSingle($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | LearnRate: {backpropTraining.LearningRate,-8} | " + stats.ToString(), false);
                     PrintProcesses(true);
                 }
-                LogSingle($"Done epoch #{epoch}", false);
+                LogSingle($"Done epoch #{epoch}", false, ConsoleColor.Green);
 
                 var validateStats = NetworkValidation.Validate(network, validateSet, IsImgRecogSuccess);
                 LogSingle("VALIDATION SET: " + validateStats.ToString(), true, ConsoleColor.Green);
@@ -77,11 +77,11 @@ namespace Handwriting {
             var startForeColor = Console.ForegroundColor;
             var startBackColor = Console.BackgroundColor;
 
-            int dimentions = (int)Math.Sqrt(greyValues.Length);
+            int dimensions = (int)Math.Sqrt(greyValues.Length);
 
             for(int i = 0; i < greyValues.Length; i++) {
                 var cur = greyValues[i];
-                if(i % dimentions == 0) {
+                if(i % dimensions == 0) {
                     Console.BackgroundColor = ConsoleColor.Black;
                     Console.WriteLine();
                 }
