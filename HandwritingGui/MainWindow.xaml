@@ -75,7 +75,7 @@
             <TabItem x:Name="TBt_Train" IsEnabled="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="6*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -84,12 +84,15 @@
                     </Grid.RowDefinitions>
                     <oxy:PlotView Grid.Row="0" Grid.Column="0"  Model="{Binding StatsOverTime.Model}" />
                     <Grid Grid.Row="0" Grid.Column="1">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="9*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <oxy:PlotView Model="{Binding SSEHist.Model}" Grid.Row="0" />
-                        <Slider Grid.Row="1" Margin="2" Minimum="1" Maximum="30" SmallChange="1" LargeChange="10" Value="{Binding SSEHist.BarCount}" TickPlacement="BottomRight" />
+                        <ProgressBar Orientation="Vertical" Margin="5" Value ="{Binding CurImgIndex, Mode=OneWay}" Maximum="{Binding ImgCount, Mode=OneWay}" />
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0} / {1}">
+                                    <Binding Path="CurImgIndex" Mode="OneWay" FallbackValue="X" />
+                                    <Binding Path="ImgCount" Mode="OneWay" FallbackValue="X" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </Grid>
                 </Grid>
             </TabItem>

@@ -85,7 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="NetworkGuiLink.cs" />
-    <Compile Include="PlotModels\SSEHistModel.cs" />
     <Compile Include="PlotModels\StatsOverTimeModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

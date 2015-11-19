@@ -4,13 +4,14 @@ using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace HandwritingGui {
 
-    internal class NetworkGuiLink {
+    internal class NetworkGuiLink : INotifyPropertyChanged {
         private LazyTrainImgLoader ImgLoader;
         private TransferFunction Transfer;
         private Network Network;
@@ -19,13 +20,15 @@ namespace HandwritingGui {
         private Random RNG;
         private volatile bool Training = false;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public StatsOverTimeModel StatsOverTime { get; private set; }
-        public SSEHistModel SSEHist { get; private set; }
+        public int ImgCount => ImgLoader.FileCount;
+        public int CurImgIndex => ImgLoader.Index;
 
         public NetworkGuiLink() {
             RNG = new Random();
             StatsOverTime = new StatsOverTimeModel();
-            SSEHist = new SSEHistModel();
         }
 
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
@@ -40,6 +43,7 @@ namespace HandwritingGui {
             }
 
             ImgLoader = new LazyTrainImgLoader(imgFolder, Transfer, true, true, imgDim, loadBatchsize/*, TODO: Support non-digits*/);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImgCount"));
             InitNetwork(learnRate, microBatchsize, inputHeight, outputHeight, hiddenHeights);
         }
 
@@ -67,7 +71,7 @@ namespace HandwritingGui {
 
                 var stats = NetworkValidation.Validate(Network, trainData, IsImgRecogSuccess);
                 StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
-                SSEHist.Update(stats.GetSSEs());
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurImgIndex"));
             }
         }
 
