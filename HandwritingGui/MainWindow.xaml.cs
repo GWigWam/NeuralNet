@@ -39,9 +39,9 @@ namespace HandwritingGui {
 
 #if DEBUG
             Tb_ImgDimensions.Text = "16";
-            Tb_ImgPath.Text = @"F:\Zooi\github\NeuralNet\Handwriting\data\img";
+            Tb_ImgPath.Text = @"G:\Handwriting Data\HSF_0";
             Tb_LearnRate.Text = "0.001";
-            Tb_LoadBatchSize.Text = "250";
+            Tb_LoadBatchSize.Text = "500";
             Tb_MicroBatchSize.Text = "10";
             Tb_NetworkDimensions.Text = "256*30*10";
             Rb_Charset_Digits.IsChecked = true;
@@ -146,9 +146,20 @@ namespace HandwritingGui {
 
             var transFunc = Rb_TFunc_HyperTan.IsChecked ?? false ? TransferFunctionType.HyperbolicTangent : TransferFunctionType.Sigmoid;
 
-            Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray());
-            ((TabItem)TC_Tabs.Items[1]).IsSelected = true;
-            Network.StartTraining();
+            Log("Creating NeuralNet...");
+            Task.Run(() => {
+                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray());
+            }).ContinueWith((t) => {
+                Dispatcher.Invoke(() => {
+                    if(t.IsCompleted) {
+                        ((TabItem)TC_Tabs.Items[1]).IsSelected = true;
+                        Network.StartTraining();
+                        Log("Network create done, start training");
+                    } else {
+                        Log($"Network creation failed: {t?.Exception?.InnerExceptions?[0]}", Colors.Red);
+                    }
+                });
+            });
         }
 
         private void Tb_ImgDimensions_TextChanged(object sender, TextChangedEventArgs e) {
