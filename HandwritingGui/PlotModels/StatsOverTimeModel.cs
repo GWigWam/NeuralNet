@@ -20,7 +20,7 @@ namespace HandwritingGui.PlotModels {
             Model = new PlotModel();
             Model.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "Batch", MinorStep = 1 });
             Model.Axes.Add(new LinearAxis() { Key = "SSE", Position = AxisPosition.Left, Title = "SSE" });
-            Model.Axes.Add(new LinearAxis() { Key = "Suc", Position = AxisPosition.Right, Title = "Success %", Minimum = 0, Maximum = 100, MinorStep = 1 });
+            Model.Axes.Add(new LinearAxis() { Key = "Suc", Position = AxisPosition.Right, Title = "Success %", Minimum = -1, Maximum = 101, MinorStep = 1 });
 
             SSE = new LineSeries() { YAxisKey = "SSE", Title = "SSE" };
             SSE.ItemsSource = new List<DataPoint>();
