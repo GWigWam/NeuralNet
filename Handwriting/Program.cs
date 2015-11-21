@@ -24,8 +24,7 @@ namespace Handwriting {
         private const int MicroBatchSize = 10;
         private const int LoadBatchSize = 300;
 
-        //private const string dirLoc = "F:/Zooi/github/NeuralNet/Handwriting/data/img/HSF_0/F0000_14";
-        private const string dirLoc = "F:/Zooi/github/NeuralNet/Handwriting/data/img/";
+        private const string dirLoc = "E:/Handwriting Data/HSF_0_SUB/";
 
         private static void Main(string[] args) {
             LogSingle("Start", false, ConsoleColor.White, ConsoleColor.Red);
@@ -98,10 +97,13 @@ namespace Handwriting {
         }
 
         private static bool IsImgRecogSuccess(double[] expected, double[] actual) {
-            for(int i = 0; i < expected.Length; i++) {
-                if(expected[i] == 1) {
-                    var success = actual.Max() == actual[i];
-                    return success;
+            var max = actual.Max();
+            if(actual.Count(d => d == max) == 1) {
+                for(int i = 0; i < expected.Length; i++) {
+                    if(expected[i] == 1) {
+                        var success = max == actual[i];
+                        return success;
+                    }
                 }
             }
 

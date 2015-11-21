@@ -29,7 +29,6 @@ namespace HandwritingGui {
             get; private set;
         }
 
-        private Random RNG;
         private volatile bool Train = false;
         private volatile Task TrainingTask;
         public bool IsTraining => TrainingTask != null && Train;
@@ -41,7 +40,6 @@ namespace HandwritingGui {
         public int CurImgIndex => ImgLoader.Index;
 
         public NetworkGuiLink() {
-            RNG = new Random();
             StatsOverTime = new StatsOverTimeModel();
         }
 
@@ -95,13 +93,8 @@ namespace HandwritingGui {
         private void TrainLoop() {
             while(Train) {
                 var trainData = ImgLoader.GetNextBatch();
-                if(trainData.Length < 1) {
-                    //End of epoch
-                    ImgLoader.ResetIndex();
-                    trainData = ImgLoader.GetNextBatch();
-                }
 
-                BackpropTrain.Train(trainData.OrderBy(e => RNG.Next()).ToArray());
+                BackpropTrain.Train(trainData);
 
                 var stats = NetworkValidation.Validate(Network, trainData, IsImgRecogSuccess);
                 StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
@@ -110,10 +103,13 @@ namespace HandwritingGui {
         }
 
         private static bool IsImgRecogSuccess(double[] expected, double[] actual) {
-            for(int i = 0; i < expected.Length; i++) {
-                if(expected[i] == 1) {
-                    var success = actual.Max() == actual[i];
-                    return success;
+            var max = actual.Max();
+            if(actual.Count(d => d == max) == 1) {
+                for(int i = 0; i < expected.Length; i++) {
+                    if(expected[i] == 1) {
+                        var success = max == actual[i];
+                        return success;
+                    }
                 }
             }
 

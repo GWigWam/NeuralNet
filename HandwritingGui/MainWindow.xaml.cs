@@ -45,8 +45,8 @@ namespace HandwritingGui {
             Tb_ImgDimensions.Text = "16";
             Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0_SUB";
             Tb_LearnRate.Text = "0.001";
-            Tb_LoadBatchSize.Text = "400";
-            Tb_MicroBatchSize.Text = "100";
+            Tb_LoadBatchSize.Text = "300";
+            Tb_MicroBatchSize.Text = "10";
             Tb_NetworkDimensions.Text = "256*30*10";
             Rb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
@@ -92,7 +92,7 @@ namespace HandwritingGui {
             }
 
             double learningRate;
-            if(!double.TryParse(Tb_LearnRate.Text, out learningRate) || learningRate <= 0) {
+            if(!double.TryParse(Tb_LearnRate.Text.Replace('.', ','), out learningRate) || learningRate <= 0) {
                 Log("Invalid learning rate", Colors.Red);
                 return;
             }
@@ -203,7 +203,7 @@ namespace HandwritingGui {
                 string file = (e.Data.GetData(DataFormats.FileDrop) as string[])?[0];
                 if(file != null) {
                     System.Drawing.Bitmap img = ImageReader.ReadImg(file, true, true, Network.ImageDimensions);
-                    double[] greyVals = img.GreyValues(Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMin);
+                    double[] greyVals = img.GreyValues(Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax);
 
                     BitmapImage displayImg;
                     using(var ms = new MemoryStream()) {
@@ -220,6 +220,9 @@ namespace HandwritingGui {
                     Tb_ClickImgHint.Visibility = Visibility.Hidden;
 
                     var output = Network.Network.GetInputResult(greyVals);
+
+                    OxyPlot_NetworkOut.Model = new PlotModels.NetworkOutputModel(output, Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax).Model;
+                    OxyPlot_NetworkOut.InvalidatePlot(true);
                 }
             } else {
                 Log("Invalid file", Colors.Red);

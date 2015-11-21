@@ -65,7 +65,8 @@ namespace HandwritingGui {
             Dimensions = dimensions;
             BatchSize = batchSize;
 
-            Files = GenFileList(dirLoc).ToArray();
+            var random = new Random();
+            Files = GenFileList(dirLoc).OrderBy(e => random.Next()).ToArray();
 
             if(startPreLoad) {
                 StartPreLoad();
@@ -124,17 +125,15 @@ namespace HandwritingGui {
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
 
             PreLoadTask = new Task(() => {
-                if(curIndex <= Files.Length) {
-                    var todoFiles = Files.Skip(curIndex);
-                    if(curIndex + BatchSize <= Files.Length) {
-                        todoFiles = todoFiles.Take(BatchSize);
-                    }
-
-                    Parallel.ForEach(todoFiles, (cur) => {
-                        var pair = GenInOutPair(cur);
-                        PreLoaded.Add(pair);
-                    });
+                var todoFiles = Files.Skip(curIndex);
+                if(curIndex + BatchSize <= Files.Length) {
+                    todoFiles = todoFiles.Take(BatchSize);
                 }
+
+                Parallel.ForEach(todoFiles, (cur) => {
+                    var pair = GenInOutPair(cur);
+                    PreLoaded.Add(pair);
+                });
             });
 
             PreLoadTask.ContinueWith((task) => {
@@ -142,7 +141,7 @@ namespace HandwritingGui {
                     curIndex += BatchSize;
 
                     if(curIndex >= Files.Length) {
-                        curIndex = Files.Length;
+                        curIndex = 0;
                     }
 
                     Loading = false;

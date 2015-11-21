@@ -101,6 +101,7 @@
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
                         <Button Grid.Column="0" x:Name="Bt_PauseLearning" Content="..." Click="Bt_PauseLearning_Click" Margin="3" />
+                        <oxy:PlotView x:Name="OxyPlot_NetworkOut" Grid.Column="1" Background="{x:Null}" />
                         <Border Grid.Column="2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="2" Padding="2">
                             <Grid IsEnabled="False" x:Name="RecogImgGrid" Drop="RecogImgGrid_Drop" AllowDrop="True" DragEnter="RecogImgGrid_DragEnter" DragLeave="RecogImgGrid_DragLeave">
                                 <Image x:Name="Img_CurSelection" />
