@@ -1,6 +1,7 @@
 ﻿using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,13 +37,14 @@ namespace HandwritingGui {
             Output = Rtb_Out.Document.Blocks;
             Network = new NetworkGuiLink();
             DataContext = Network;
+            Network.PropertyChanged += NetworkPropertyChanged;
 
 #if DEBUG
             Tb_ImgDimensions.Text = "16";
-            Tb_ImgPath.Text = @"G:\Handwriting Data\HSF_0";
+            Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0_SUB";
             Tb_LearnRate.Text = "0.001";
-            Tb_LoadBatchSize.Text = "500";
-            Tb_MicroBatchSize.Text = "10";
+            Tb_LoadBatchSize.Text = "400";
+            Tb_MicroBatchSize.Text = "100";
             Tb_NetworkDimensions.Text = "256*30*10";
             Rb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
@@ -51,14 +53,16 @@ namespace HandwritingGui {
         }
 
         public void Log(string msg, Color? foreground = null, Color? background = null) {
-            var foreBrush = foreground != null ? new SolidColorBrush(foreground.Value) : Rtb_Out.Foreground;
-            var backBrush = background != null ? new SolidColorBrush(background.Value) : Rtb_Out.Background;
+            Dispatcher.InvokeAsync(() => {
+                var foreBrush = foreground != null ? new SolidColorBrush(foreground.Value) : Rtb_Out.Foreground;
+                var backBrush = background != null ? new SolidColorBrush(background.Value) : Rtb_Out.Background;
 
-            Output.Add(new Paragraph(new Run(msg) { Foreground = foreBrush, Background = backBrush }));
+                Output.Add(new Paragraph(new Run($"HG> {msg}") { Foreground = foreBrush, Background = backBrush }));
 
-            if(!Keyboard.IsKeyToggled(Key.Scroll)) {
-                Rtb_Out.ScrollToEnd();
-            }
+                if(!Keyboard.IsKeyToggled(Key.Scroll)) {
+                    Rtb_Out.ScrollToEnd();
+                }
+            });
         }
 
         private void PreviewUnsignedIntTb(object sender, TextCompositionEventArgs e) {
@@ -152,7 +156,7 @@ namespace HandwritingGui {
             }).ContinueWith((t) => {
                 Dispatcher.Invoke(() => {
                     if(t.IsCompleted) {
-                        ((TabItem)TC_Tabs.Items[1]).IsSelected = true;
+                        ((TabItem)Tc_Tabs.Items[1]).IsSelected = true;
                         Network.StartTraining();
                         Log("Network create done, start training");
                     } else {
@@ -177,6 +181,66 @@ namespace HandwritingGui {
             if(IsInitialized) {
                 Tb_NetworkDimensions.Text = new Regex(@"\*(\d+|X)$").Replace(Tb_NetworkDimensions.Text, "*" + ((string)((RadioButton)sender).Tag));
             }
+        }
+
+        private void Bt_PauseLearning_Click(object sender, RoutedEventArgs e) {
+            if(Network.IsTraining) {
+                Log("Pausing training...");
+                Network.PauseTraining();
+            } else {
+                Log("Starting training...");
+                Network.StartTraining();
+            }
+        }
+
+        private void RecogImgGrid_Drop(object sender, DragEventArgs e) {
+            RecogImgGrid.Background = Brushes.Transparent;
+            if(IsValidBMPImgDrop(e)) {
+                Log("Image dropped");
+            } else {
+                Log("Invalid file", Colors.Red);
+            }
+        }
+
+        private void RecogImgGrid_DragEnter(object sender, DragEventArgs e) {
+            if(IsValidBMPImgDrop(e)) {
+                RecogImgGrid.Background = Brushes.Green;
+            } else {
+                RecogImgGrid.Background = Brushes.Red;
+            }
+        }
+
+        private void RecogImgGrid_DragLeave(object sender, DragEventArgs e) {
+            RecogImgGrid.Background = Brushes.Transparent;
+        }
+
+        private bool IsValidBMPImgDrop(DragEventArgs e) {
+            if(e.Data.GetDataPresent(DataFormats.FileDrop)) {
+                string file = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
+                if(file.EndsWith(".bmp", StringComparison.CurrentCultureIgnoreCase)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void NetworkPropertyChanged(object sender, PropertyChangedEventArgs e) {
+            Dispatcher.Invoke(() => {
+                if(e.PropertyName == "IsTraining") {
+                    if(Network.IsTraining) {
+                        Log("Training started", null, Colors.WhiteSmoke);
+                        Bt_PauseLearning.Content = "Pause";
+                        RecogImgGrid.IsEnabled = false;
+                        Tb_ClickImgHint.Text = "Pause For User Input";
+                    } else {
+                        Log("Training paused", null, Colors.WhiteSmoke);
+                        Bt_PauseLearning.Content = "Start";
+                        RecogImgGrid.IsEnabled = true;
+                        Tb_ClickImgHint.Text = "Drag & Drop Image";
+                    }
+                }
+            });
         }
     }
 }

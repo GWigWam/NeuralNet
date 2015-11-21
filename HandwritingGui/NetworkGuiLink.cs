@@ -18,7 +18,9 @@ namespace HandwritingGui {
         private Backpropagate BackpropTrain;
 
         private Random RNG;
-        private volatile bool Training = false;
+        private volatile bool Train = false;
+        private volatile Task TrainingTask;
+        public bool IsTraining => TrainingTask != null && Train;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -48,8 +50,23 @@ namespace HandwritingGui {
         }
 
         public void StartTraining() {
-            Training = true;
-            Task.Run(() => TrainLoop());
+            if(TrainingTask == null && !Train) {
+                Train = true;
+                TrainingTask = new Task(TrainLoop);
+                TrainingTask.Start();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
+            }
+        }
+
+        public async void PauseTraining() {
+            await Task.Run(() => {
+                if(TrainingTask != null && Train) {
+                    Train = false;
+                    TrainingTask.Wait();
+                    TrainingTask = null;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
+                }
+            });
         }
 
         private void InitNetwork(double learnRate, int microBatchsize, int inputHeight, int outputHeight, int[] hiddenHeights) {
@@ -59,7 +76,7 @@ namespace HandwritingGui {
         }
 
         private void TrainLoop() {
-            while(Training) {
+            while(Train) {
                 var trainData = ImgLoader.GetNextBatch();
                 if(trainData.Length < 1) {
                     //End of epoch

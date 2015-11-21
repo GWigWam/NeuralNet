@@ -6,14 +6,14 @@
         xmlns:oxy="http://oxyplot.org/wpf"
         xmlns:local="clr-namespace:HandwritingGui"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="MainWindow" Height="720" Width="1080">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*" />
             <RowDefinition Height="1*" />
         </Grid.RowDefinitions>
-        <TabControl x:Name="TC_Tabs" Grid.Row="0">
-            <TabItem x:Name="TBt_Setup" IsEnabled="False">
+        <TabControl x:Name="Tc_Tabs" Grid.Row="0">
+            <TabItem x:Name="Ti_Setup" IsEnabled="False">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200" />
@@ -72,20 +72,20 @@
                     <Button x:Name="Bt_SetupReady" Margin="3" Padding="3" Grid.Column="1" Grid.Row="8" Content="Ready" HorizontalAlignment="Center" VerticalAlignment="Center" Click="Bt_SetupReady_Click" />
                 </Grid>
             </TabItem>
-            <TabItem x:Name="TBt_Train" IsEnabled="False">
+            <TabItem x:Name="Tb_Train" IsEnabled="False">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="6*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <oxy:PlotView Grid.Row="0" Grid.Column="0"  Model="{Binding StatsOverTime.Model}" />
-                    <Grid Grid.Row="0" Grid.Column="1">
-                        <ProgressBar Orientation="Vertical" Margin="5" Value ="{Binding CurImgIndex, Mode=OneWay}" Maximum="{Binding ImgCount, Mode=OneWay}" />
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold">
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width ="8*" />
+                            <ColumnDefinition Width ="*" />
+                        </Grid.ColumnDefinitions>
+                        <oxy:PlotView Grid.Column="0"  Model="{Binding StatsOverTime.Model}" Background="{x:Null}" />
+                        <ProgressBar Grid.Column="1" Orientation="Vertical" Margin="5" Value ="{Binding CurImgIndex, Mode=OneWay}" Maximum="{Binding ImgCount, Mode=OneWay}" />
+                        <TextBlock Grid.Column="1"  HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" FontWeight="Bold">
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0} / {1}">
                                     <Binding Path="CurImgIndex" Mode="OneWay" FallbackValue="X" />
@@ -93,6 +93,20 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="12*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="Bt_PauseLearning" Content="..." Click="Bt_PauseLearning_Click" Margin="3" />
+                        <Border Grid.Column="2" BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" BorderThickness="2" Padding="2">
+                            <Grid IsEnabled="False" x:Name="RecogImgGrid" Drop="RecogImgGrid_Drop" AllowDrop="True" DragEnter="RecogImgGrid_DragEnter" DragLeave="RecogImgGrid_DragLeave">
+                                <Image x:Name="Img_CurSelection" />
+                                <TextBlock x:Name="Tb_ClickImgHint" Text="..." HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="Wrap" FontSize="21.333" TextAlignment="Center" />
+                            </Grid>
+                        </Border>
                     </Grid>
                 </Grid>
             </TabItem>
