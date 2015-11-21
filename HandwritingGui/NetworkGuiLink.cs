@@ -12,10 +12,22 @@ using System.Threading.Tasks;
 namespace HandwritingGui {
 
     internal class NetworkGuiLink : INotifyPropertyChanged {
-        private LazyTrainImgLoader ImgLoader;
-        private TransferFunction Transfer;
-        private Network Network;
-        private Backpropagate BackpropTrain;
+
+        public LazyTrainImgLoader ImgLoader {
+            get; private set;
+        }
+
+        public TransferFunction TransferFunc {
+            get; private set;
+        }
+
+        public Network Network {
+            get; private set;
+        }
+
+        public Backpropagate BackpropTrain {
+            get; private set;
+        }
 
         private Random RNG;
         private volatile bool Train = false;
@@ -33,18 +45,23 @@ namespace HandwritingGui {
             StatsOverTime = new StatsOverTimeModel();
         }
 
+        public int ImageDimensions {
+            get; private set;
+        }
+
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
             switch(funcType) {
                 case TransferFunctionType.Sigmoid:
-                Transfer = new SigmoidFunction();
+                TransferFunc = new SigmoidFunction();
                 break;
 
                 case TransferFunctionType.HyperbolicTangent:
-                Transfer = new HyperbolicTangentFunction();
+                TransferFunc = new HyperbolicTangentFunction();
                 break;
             }
+            ImageDimensions = imgDim;
 
-            ImgLoader = new LazyTrainImgLoader(imgFolder, Transfer, true, true, imgDim, loadBatchsize/*, TODO: Support non-digits*/);
+            ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize/*, TODO: Support non-digits*/);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImgCount"));
             InitNetwork(learnRate, microBatchsize, inputHeight, outputHeight, hiddenHeights);
         }
@@ -70,7 +87,7 @@ namespace HandwritingGui {
         }
 
         private void InitNetwork(double learnRate, int microBatchsize, int inputHeight, int outputHeight, int[] hiddenHeights) {
-            Network = new Network(Transfer, true);
+            Network = new Network(TransferFunc, true);
             Network.FillNetwork(inputHeight, outputHeight, hiddenHeights);
             BackpropTrain = new Backpropagate(Network, learnRate, microBatchsize);
         }

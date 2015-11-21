@@ -1,7 +1,9 @@
-﻿using NeuralNet.TransferFunctions;
+﻿using BitmapHelper;
+using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -197,6 +199,28 @@ namespace HandwritingGui {
             RecogImgGrid.Background = Brushes.Transparent;
             if(IsValidBMPImgDrop(e)) {
                 Log("Image dropped");
+
+                string file = (e.Data.GetData(DataFormats.FileDrop) as string[])?[0];
+                if(file != null) {
+                    System.Drawing.Bitmap img = ImageReader.ReadImg(file, true, true, Network.ImageDimensions);
+                    double[] greyVals = img.GreyValues(Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMin);
+
+                    BitmapImage displayImg;
+                    using(var ms = new MemoryStream()) {
+                        img.Save(ms, ImageFormat.Bmp);
+                        ms.Position = 0;
+                        displayImg = new BitmapImage();
+                        displayImg.BeginInit();
+                        displayImg.StreamSource = ms;
+                        displayImg.CacheOption = BitmapCacheOption.OnLoad;
+                        displayImg.EndInit();
+                    }
+
+                    Img_CurSelection.Source = displayImg;
+                    Tb_ClickImgHint.Visibility = Visibility.Hidden;
+
+                    var output = Network.Network.GetInputResult(greyVals);
+                }
             } else {
                 Log("Invalid file", Colors.Red);
             }
