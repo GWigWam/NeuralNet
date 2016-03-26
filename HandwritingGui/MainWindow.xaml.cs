@@ -41,16 +41,16 @@ namespace HandwritingGui {
             DataContext = Network;
             Network.PropertyChanged += NetworkPropertyChanged;
 
-#if DEBUG
-            Tb_ImgDimensions.Text = "16";
-            Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0_SUB";
+            //Defaults
+            Tb_ImgDimensions.Text = "12";
+            Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0";
             Tb_LearnRate.Text = "0.001";
             Tb_LoadBatchSize.Text = "300";
             Tb_MicroBatchSize.Text = "10";
             Tb_NetworkDimensions.Text = "256*30*10";
             Rb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
-#endif
+
             Log("UI init complete!");
         }
 
