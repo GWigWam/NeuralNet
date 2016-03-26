@@ -9,9 +9,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace HandwritingGui {
+namespace LazyImgLoader {
 
-    internal class LazyTrainImgLoader {
+    public class LazyTrainImgLoader {
 
         public int PreLoad {
             get; set;

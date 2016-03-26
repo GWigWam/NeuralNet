@@ -1,4 +1,5 @@
 ﻿using HandwritingGui.PlotModels;
+using LazyImgLoader;
 using NeuralNet;
 using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;

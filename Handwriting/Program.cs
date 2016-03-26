@@ -1,4 +1,5 @@
-﻿using NeuralNet;
+﻿using LazyImgLoader;
+using NeuralNet;
 using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;
 using System;
@@ -28,7 +29,7 @@ namespace Handwriting {
 
         private static void Main(string[] args) {
             LogSingle("Start", false, ConsoleColor.White, ConsoleColor.Red);
-            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, true, ImgDimensions, LoadBatchSize);
+            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, ImgDimensions, LoadBatchSize, true, true);
 
             InputExpectedResult[] validateSet = imgLoader.GetNextBatch();
 
@@ -41,28 +42,29 @@ namespace Handwriting {
             var startTime = Environment.TickCount;
             double prevSSE = double.MaxValue;
             InputExpectedResult[] trainData;
-            for(int epoch = 0; true; epoch++) {
-                double CurLearnRate = LearningRate;
-                while((trainData = imgLoader.GetNextBatch()).Length > 0) {
-                    backpropTraining.Train(trainData.OrderBy(e => random.Next()).ToArray());
+            int epoch = 0;
+            double CurLearnRate = LearningRate;
+            while((trainData = imgLoader.GetNextBatch()).Length > 0) {
+                backpropTraining.Train(trainData.OrderBy(e => random.Next()).ToArray());
 
-                    var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
-                    LogSingle($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | LearnRate: {backpropTraining.LearningRate,-8} | " + stats.ToString(), false);
-                    PrintProcesses(true);
+                var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);
+                LogSingle($"{imgLoader.Index,-4} / {imgLoader.FileCount,-5} | LearnRate: {backpropTraining.LearningRate,-8} | " + stats.ToString(), false);
+                PrintProcesses(true);
+
+                if(imgLoader.Index >= imgLoader.FileCount - imgLoader.BatchSize) {
+                    epoch++;
+                    LogSingle($"Done epoch #{epoch}", false, ConsoleColor.Green);
+
+                    var validateStats = NetworkValidation.Validate(network, validateSet, IsImgRecogSuccess);
+                    LogSingle("VALIDATION SET: " + validateStats.ToString(), true, ConsoleColor.Green);
+                    LogSingle($"Total time: {Environment.TickCount - startTime}Ms", false, ConsoleColor.Green);
+
+                    if(prevSSE <= validateStats.AvgSSE) {
+                        CurLearnRate /= 2;
+                        backpropTraining.LearningRate = CurLearnRate;
+                    }
+                    prevSSE = validateStats.AvgSSE;
                 }
-                LogSingle($"Done epoch #{epoch}", false, ConsoleColor.Green);
-
-                var validateStats = NetworkValidation.Validate(network, validateSet, IsImgRecogSuccess);
-                LogSingle("VALIDATION SET: " + validateStats.ToString(), true, ConsoleColor.Green);
-                LogSingle($"Total time: {Environment.TickCount - startTime}Ms", false, ConsoleColor.Green);
-
-                if(prevSSE <= validateStats.AvgSSE) {
-                    CurLearnRate /= 2;
-                    backpropTraining.LearningRate = CurLearnRate;
-                }
-                prevSSE = validateStats.AvgSSE;
-
-                imgLoader.ResetIndex();
             }
 
             Console.ReadKey();
