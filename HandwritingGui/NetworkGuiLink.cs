@@ -48,7 +48,13 @@ namespace HandwritingGui {
             get; private set;
         }
 
+        private TaskFactory taskFactory {
+            get; set;
+        }
+
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
+            taskFactory = new TaskFactory();
+
             switch(funcType) {
                 case TransferFunctionType.Sigmoid:
                 TransferFunc = new SigmoidFunction();
@@ -68,8 +74,7 @@ namespace HandwritingGui {
         public void StartTraining() {
             if(TrainingTask == null && !Train) {
                 Train = true;
-                TrainingTask = new Task(TrainLoop);
-                TrainingTask.Start();
+                TrainingTask = taskFactory.StartNew(TrainLoop);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
             }
         }
