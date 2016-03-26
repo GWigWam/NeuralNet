@@ -131,6 +131,9 @@ namespace BitmapHelper {
                         //level is 0 <--> 255
                         int greyLevel = pixTotal / (bitPerPixel / 8);
 
+                        //Invert: 255 <--> 0 (readability)
+                        greyLevel = Math.Abs(greyLevel - 255);
+
                         greyVals[y * bmp.Height + x] = ShiftRange(greyLevel, 0, 255, min, max);
                     }
                     dataPtr += bmpData.Stride;
