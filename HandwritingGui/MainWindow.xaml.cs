@@ -92,7 +92,7 @@ namespace HandwritingGui {
             }
 
             double learningRate;
-            if(!double.TryParse(Tb_LearnRate.Text.Replace('.', ','), out learningRate) || learningRate <= 0) {
+            if(!double.TryParse(Tb_LearnRate.Text, out learningRate) || learningRate <= 0) {
                 Log("Invalid learning rate", Colors.Red);
                 return;
             }
