@@ -253,7 +253,7 @@ namespace HandwritingGui {
         }
 
         private void NetworkPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            Dispatcher.Invoke(() => {
+            Dispatcher.BeginInvoke((Action)(() => {
                 if(e.PropertyName == "IsTraining") {
                     if(Network.IsTraining) {
                         Log("Training started", null, Colors.WhiteSmoke);
@@ -267,7 +267,7 @@ namespace HandwritingGui {
                         Tb_ClickImgHint.Text = "Drag & Drop Image";
                     }
                 }
-            });
+            }));
         }
     }
 }
