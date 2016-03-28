@@ -46,7 +46,7 @@ namespace HandwritingGui {
             Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0";
             Tb_LearnRate.Text = "0.001";
             Tb_LoadBatchSize.Text = "300";
-            Tb_MicroBatchSize.Text = "10";
+            Tb_MicroBatchSize.Text = "1"; //Using micro batches improves parallelism but severely degrades effectivity of backpropagation
             Tb_NetworkDimensions.Text = "144*30*10";
             Rb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
