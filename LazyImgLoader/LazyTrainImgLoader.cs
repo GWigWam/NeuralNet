@@ -66,7 +66,7 @@ namespace LazyImgLoader {
             BatchSize = batchSize;
 
             var random = new Random();
-            Files = GenFileList(dirLoc).OrderBy(e => random.Next()).ToArray();
+            Files = GenFileList(dirLoc)/*.OrderBy(e => random.Next())*/.ToArray();
 
             if(startPreLoad) {
                 StartPreLoad();
@@ -83,6 +83,12 @@ namespace LazyImgLoader {
             StartPreLoad();
 
             return ret;
+        }
+
+        public IEnumerable<InputExpectedResult> SimpleGet(int index, int size) {
+            foreach(var file in Files.Skip(index).Take(size)) {
+                yield return GenInOutPair(file);
+            }
         }
 
         public void ResetIndex() {

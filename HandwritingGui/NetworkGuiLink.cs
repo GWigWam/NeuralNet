@@ -109,6 +109,7 @@ namespace HandwritingGui {
         }
 
         private void TrainLoop() {
+            var validationData = ImgLoader.SimpleGet(0, 100).ToArray();
             bool doTrain = Train;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
             while(true) {
@@ -117,7 +118,7 @@ namespace HandwritingGui {
 
                     BackpropTrain.Train(trainData);
 
-                    var stats = NetworkValidation.Validate(Network, trainData, IsImgRecogSuccess);
+                    var stats = NetworkValidation.Validate(Network, validationData, IsImgRecogSuccess);
                     StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurImgIndex"));
 
