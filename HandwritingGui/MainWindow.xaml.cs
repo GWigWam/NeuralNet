@@ -51,6 +51,10 @@ namespace HandwritingGui {
             Rb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
 
+            Closing += (s, a) => {
+                Network?.Dispose();
+            };
+
             Log("UI init complete!");
         }
 

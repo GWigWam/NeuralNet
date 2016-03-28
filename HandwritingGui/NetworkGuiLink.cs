@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace HandwritingGui {
 
-    internal class NetworkGuiLink : INotifyPropertyChanged {
+    internal class NetworkGuiLink : INotifyPropertyChanged, IDisposable {
 
         public LazyTrainImgLoader ImgLoader {
             get; private set;
@@ -40,7 +40,7 @@ namespace HandwritingGui {
         }
 
         private volatile Thread TrainThread;
-        public bool IsTraining => train;
+        public bool IsTraining => Train;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -134,6 +134,10 @@ namespace HandwritingGui {
                     }
                 }
             }
+        }
+
+        public void Dispose() {
+            TrainThread.Abort();
         }
     }
 }
