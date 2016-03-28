@@ -35,16 +35,18 @@ namespace NeuralNet.BackpropagationTraining {
 
             //Loop trough all network connections and add them to ConnectionInfluence list
             ConnectionInfluence = new ConcurrentDictionary<Connection, double?[]>();
+            var fillAllCollections = new List<Connection>();
             for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
                 for(int index = 0; index < Network.Nodes[layer].Length; index++) {
                     //Loop trough current nodes incomming connections
                     foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
                         ConnectionInfluence.TryAdd(con, new double?[MicroBatchSize]);
+                        fillAllCollections.Add(con);
                     }
                 }
             }
 
-            AllConnections = ConnectionInfluence.Keys.ToArray();
+            AllConnections = fillAllCollections.ToArray();
         }
 
         public void Train(InputExpectedResult[] expected) {
@@ -62,10 +64,12 @@ namespace NeuralNet.BackpropagationTraining {
                 });
 
                 //Update weights
-                foreach(KeyValuePair<Connection, double?[]> conInfPair in ConnectionInfluence) {
-                    double outputInfluence = conInfPair.Value.Sum(d => (d ?? 0) * conInfPair.Key.FromNode.Output);
+                foreach(var con in AllConnections) {
+                    var conInfPair = ConnectionInfluence[con];
+
+                    double outputInfluence = conInfPair.Sum(d => (d ?? 0) * con.FromNode.Output);
                     double deltaWeight = -LearningRate * outputInfluence;
-                    conInfPair.Key.Weight += deltaWeight;
+                    con.Weight += deltaWeight;
                 }
                 LogProcess("Update weights");
             }
@@ -75,7 +79,6 @@ namespace NeuralNet.BackpropagationTraining {
             ResetCurTimer();
             double[] actual = Network.GetInputResult(irp.Input);
             double[] target = irp.Output;
-
             LogProcess("Load actual / target");
 
             //Set output influence value
@@ -88,6 +91,10 @@ namespace NeuralNet.BackpropagationTraining {
                     double preCalc = CalcOutputInfuence(toOutputCon, curTarget, curActual);
                     ConnectionInfluence[toOutputCon][microBatchIndex] = preCalc;
                 }
+            }
+            var li = new List<double?>();
+            foreach(var con in AllConnections) {
+                li.AddRange(ConnectionInfluence[con].Where(c => c != null));
             }
 
             LogProcess("Set output influence values");
