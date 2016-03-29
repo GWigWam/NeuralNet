@@ -24,12 +24,12 @@ namespace NeuralNet.Nodes {
             get;
         }
 
-        public Connection[] GetIncommingConnections() {
-            return IncommingConnections.ToArray();
+        public List<Connection> GetIncommingConnections() {
+            return IncommingConnections;
         }
 
-        public Connection[] GetOutgoingConnections() {
-            return OutgoingConnections.ToArray();
+        public List<Connection> GetOutgoingConnections() {
+            return OutgoingConnections;
         }
 
         internal void AddIncommingConnection(Connection connection) {

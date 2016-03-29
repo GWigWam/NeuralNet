@@ -6,8 +6,10 @@ using NeuralNet.Nodes;
 using NeuralNet.TransferFunctions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Test {
@@ -75,8 +77,8 @@ namespace Test {
             Assert.IsTrue(nw.Nodes[2].Length == layer2);
             Assert.IsTrue(nw.Nodes[3].Length == outputs);
 
-            Assert.IsTrue(((Perceptron)nw.Nodes[3][0]).GetIncommingConnections().Length == layer2 + 1); // +1 for bias node
-            Assert.IsTrue(((Perceptron)nw.Nodes[2][3]).GetIncommingConnections().Length == layer1 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[3][0]).GetIncommingConnections().Count == layer2 + 1); // +1 for bias node
+            Assert.IsTrue(((Perceptron)nw.Nodes[2][3]).GetIncommingConnections().Count == layer1 + 1); // +1 for bias node
         }
 
         [TestMethod]
