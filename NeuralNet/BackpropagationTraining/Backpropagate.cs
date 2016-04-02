@@ -92,10 +92,6 @@ namespace NeuralNet.BackpropagationTraining {
                     ConnectionInfluence[toOutputCon][microBatchIndex] = preCalc;
                 }
             }
-            var li = new List<double?>();
-            foreach(var con in AllConnections) {
-                li.AddRange(ConnectionInfluence[con].Where(c => c != null));
-            }
 
             LogProcess("Set output influence values");
 
