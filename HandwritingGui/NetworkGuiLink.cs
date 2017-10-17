@@ -45,8 +45,8 @@ namespace HandwritingGui {
         public event PropertyChangedEventHandler PropertyChanged;
 
         public StatsOverTimeModel StatsOverTime { get; private set; }
-        public int ImgCount => ImgLoader.FileCount;
-        public int CurImgIndex => ImgLoader.Index;
+        public int ImgCount => ImgLoader?.FileCount ?? -1;
+        public int CurImgIndex => ImgLoader?.Index ?? -1;
 
         public NetworkGuiLink() {
             StatsOverTime = new StatsOverTimeModel();
