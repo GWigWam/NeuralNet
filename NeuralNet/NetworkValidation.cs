@@ -12,10 +12,10 @@ namespace NeuralNet {
         public static ValidationResult Validate(Network network, IEnumerable<InputExpectedResult> inputResults, Func<double[], double[], bool> checkSuccess) {
             ValidationResult totalResult = null;
             foreach(var cur in inputResults) {
-                double[] actual = network.GetInputResult(cur.Input);
+                double[] actual = network.GetOutputForInput(cur.Input);
 
-                double sse = SumSquaredError(cur.Output, actual);
-                bool success = checkSuccess(cur.Output, actual);
+                double sse = SumSquaredError(cur.ExpectedOutput, actual);
+                bool success = checkSuccess(cur.ExpectedOutput, actual);
 
                 var res = new ValidationResult(sse, success);
 

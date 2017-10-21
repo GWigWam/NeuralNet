@@ -99,7 +99,7 @@ namespace Test {
                 new Node[] { outputNode }
             };
 
-            var nwOut = nw.CurOutput()[0];
+            var nwOut = nw.GetOutput()[0];
             Assert.AreEqual(outputNode.Output, nwOut);
 
             var expOut = sigmoid.Calculate(input * weight);
@@ -125,7 +125,7 @@ namespace Test {
                 new Node[] { outputNode }
             };
 
-            var nwOut = nw.GetInputResult(input)[0];
+            var nwOut = nw.GetOutputForInput(input)[0];
 
             //Output
             // = Sig(inpToOut.Output)
@@ -210,6 +210,40 @@ namespace Test {
             var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
 
             var bp = new Backpropagate(net, 0.5);
+            bp.Train(new InputExpectedResult[] { expected });
+
+            var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+
+            Assert.IsTrue(before.AvgSSE > after.AvgSSE);
+        }
+
+        [TestMethod]
+        public void TestTraining2() {
+            var sigmoid = new SigmoidFunction();
+
+            var net = new Network(sigmoid, true);
+            net.FillNetwork(2, 2, 2);
+
+            net.Nodes[0][0].GetOutgoingConnections()[0].Weight = .15;
+            net.Nodes[0][0].GetOutgoingConnections()[1].Weight = .25;
+            net.Nodes[0][1].GetOutgoingConnections()[0].Weight = .20;
+            net.Nodes[0][1].GetOutgoingConnections()[1].Weight = .30;
+            net.Nodes[1][0].GetOutgoingConnections()[0].Weight = .40;
+            net.Nodes[1][0].GetOutgoingConnections()[1].Weight = .50;
+            net.Nodes[1][1].GetOutgoingConnections()[0].Weight = .45;
+            net.Nodes[1][1].GetOutgoingConnections()[1].Weight = .55;
+
+            var biasOut = net.Bias.GetOutgoingConnections();
+            biasOut[0].Weight = .35; // Bias --> H0.0
+            biasOut[1].Weight = .35; // Bias --> H0.1
+            biasOut[2].Weight = .60; // Bias --> O.0
+            biasOut[3].Weight = .60; // Bias --> O.1
+
+            var expected = new InputExpectedResult(new double[] { .05, .1 }, new double[] { .01, .99 });
+
+            var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+
+            var bp = new Backpropagate2(net, 0.5);
             bp.Train(new InputExpectedResult[] { expected });
 
             var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);

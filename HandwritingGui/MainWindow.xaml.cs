@@ -43,7 +43,8 @@ namespace HandwritingGui {
 
             //Defaults
             Tb_ImgDimensions.Text = "12";
-            Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0";
+            //Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0";
+            Tb_ImgPath.Text = @"..\..\..\HandwritingData\HSF_0";
             Tb_LearnRate.Text = "0.001";
             Tb_LoadBatchSize.Text = "300";
             Tb_MicroBatchSize.Text = "1"; //Using micro batches improves parallelism but severely degrades effectivity of backpropagation
@@ -223,7 +224,7 @@ namespace HandwritingGui {
                     Img_CurSelection.Source = displayImg;
                     Tb_ClickImgHint.Visibility = Visibility.Hidden;
 
-                    var output = Network.Network.GetInputResult(greyVals);
+                    var output = Network.Network.GetOutputForInput(greyVals);
 
                     OxyPlot_NetworkOut.Model = new PlotModels.NetworkOutputModel(output, Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax).Model;
                     OxyPlot_NetworkOut.InvalidatePlot(true);

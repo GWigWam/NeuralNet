@@ -67,6 +67,9 @@ namespace NeuralNet.BackpropagationTraining {
                 foreach(var con in AllConnections) {
                     var conInfPair = ConnectionInfluence[con];
 
+                    //TODO
+                    // Following uses the node 'Output', is this ok?
+                    // The output depends on current network state, this might be changed when working in parallel (microbatches, see Parallel.For)
                     double outputInfluence = conInfPair.Sum(d => (d ?? 0) * con.FromNode.Output);
                     double deltaWeight = -LearningRate * outputInfluence;
                     con.Weight += deltaWeight;
@@ -77,8 +80,8 @@ namespace NeuralNet.BackpropagationTraining {
 
         private void AdjustWeights(InputExpectedResult irp, int microBatchIndex) {
             ResetCurTimer();
-            double[] actual = Network.GetInputResult(irp.Input);
-            double[] target = irp.Output;
+            double[] actual = Network.GetOutputForInput(irp.Input);
+            double[] target = irp.ExpectedOutput;
             LogProcess("Load actual / target");
 
             //Set output influence value

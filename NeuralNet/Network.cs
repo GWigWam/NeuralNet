@@ -74,24 +74,28 @@ namespace NeuralNet {
             }
         }
 
-        public double[] GetInputResult(params double[] input) {
-            if(input.Length != Nodes[0].Length) {
+        public double[][] GetValuesForInput(params double[] input) {
+            if (input.Length != Nodes[0].Length) {
                 throw new ArgumentOutOfRangeException(nameof(input));
             }
 
-            for(int i = 0; i < input.Length; i++) {
+            for (int i = 0; i < input.Length; i++) {
                 ((Input)Nodes[0][i]).Value = input[i];
             }
 
-            return CurOutput();
+            return GetValues(true);
         }
 
-        public double[] CurOutput(bool ResetCache = true) {
-            if(ResetCache) {
+        public double[][] GetValues(bool resetCache = true) {
+            if (resetCache) {
                 ResetPerceptronCache();
             }
-            return Nodes[Nodes.Length - 1].Select(p => p.Output).ToArray();
+            return Nodes.Select(lay => lay.Select(n => n.Output).ToArray()).ToArray();
         }
+
+        public double[] GetOutputForInput(params double[] input) => GetValuesForInput(input)[Nodes.Length - 1];
+
+        public double[] GetOutput(bool resetCache = true) => GetValues(resetCache)[Nodes.Length - 1];
 
         public void RandomizeWeights() {
             foreach(Connection connection in Nodes.SelectMany(nodeAr => nodeAr).SelectMany(Node => Node.GetIncommingConnections())) {

@@ -2,11 +2,11 @@
 
     public struct InputExpectedResult {
         public readonly double[] Input;
-        public readonly double[] Output;
+        public readonly double[] ExpectedOutput;
 
         public InputExpectedResult(double[] input, double[] output) {
             Input = input;
-            Output = output;
+            ExpectedOutput = output;
         }
     }
 }
