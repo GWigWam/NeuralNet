@@ -51,6 +51,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -60,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackpropagationTraining\Backpropagate.cs" />
+    <Compile Include="BackpropagationTraining\Backpropagate2.cs" />
     <Compile Include="InputExpectedResult.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="NetworkValidation.cs" />
@@ -75,6 +79,9 @@
     <Compile Include="TransferFunctions\SigmoidFunction.cs" />
     <Compile Include="TransferFunctions\TransferFunction.cs" />
     <Compile Include="TransferFunctions\TransferFunctionType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
