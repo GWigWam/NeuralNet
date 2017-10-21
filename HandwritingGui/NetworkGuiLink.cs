@@ -27,7 +27,7 @@ namespace HandwritingGui {
             get; private set;
         }
 
-        public Backpropagate BackpropTrain {
+        public Backpropagate2 BackpropTrain {
             get; private set;
         }
 
@@ -76,7 +76,8 @@ namespace HandwritingGui {
         private void InitNetwork(double learnRate, int microBatchsize, int inputHeight, int outputHeight, int[] hiddenHeights) {
             Network = new Network(TransferFunc, true);
             Network.FillNetwork(inputHeight, outputHeight, hiddenHeights);
-            BackpropTrain = new Backpropagate(Network, learnRate, microBatchsize);
+            //BackpropTrain = new Backpropagate(Network, learnRate, microBatchsize);
+            BackpropTrain = new Backpropagate2(Network, learnRate);
         }
 
         private static bool IsImgRecogSuccess(double[] expected, double[] actual) {

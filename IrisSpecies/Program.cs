@@ -11,7 +11,7 @@ namespace IrisSpecies {
 
     internal class Program {
         private const int TrainSetSize = 130;
-        private static Random random = new Random();
+        private static Random random = new Random(4);
 
         private static void Main(string[] args) {
             var data = DataReader.ReadFromFile("data/iris.data")/*.OrderBy(i => random.Next())*/;
@@ -30,7 +30,7 @@ namespace IrisSpecies {
             var inputAndExpectedResuls = train.Select(entry => new InputExpectedResult(entry.AsInput, entry.AsOutput));
             var validation = data.Skip(TrainSetSize).ToArray();
 
-            var bp = new Backpropagate(network, 0.5, 3);
+            var bp = new Backpropagate(network, 0.5);
 
             var trainData = inputAndExpectedResuls.ToArray();
 
