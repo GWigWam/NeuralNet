@@ -20,7 +20,7 @@ namespace NeuralNet.Nodes {
             get;
         }
 
-        public abstract double Output {
+        public abstract float Output {
             get;
         }
 

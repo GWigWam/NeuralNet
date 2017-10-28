@@ -98,7 +98,7 @@ namespace Handwriting {
             Console.BackgroundColor = startBackColor;
         }
 
-        private static bool IsImgRecogSuccess(double[] expected, double[] actual) {
+        private static bool IsImgRecogSuccess(float[] expected, float[] actual) {
             var max = actual.Max();
             if(actual.Count(d => d == max) == 1) {
                 for(int i = 0; i < expected.Length; i++) {

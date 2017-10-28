@@ -208,7 +208,7 @@ namespace HandwritingGui {
                 string file = (e.Data.GetData(DataFormats.FileDrop) as string[])?[0];
                 if(file != null) {
                     System.Drawing.Bitmap img = ImageReader.ReadImg(file, true, true, Network.ImageDimensions);
-                    double[] greyVals = img.GreyValues(Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax);
+                    float[] greyVals = img.GreyValues(Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax);
 
                     BitmapImage displayImg;
                     using(var ms = new MemoryStream()) {

@@ -24,7 +24,7 @@ namespace NeuralNet.BackpropagationTraining {
             get;
         }
 
-        private volatile ConcurrentDictionary<Connection, double?[]> ConnectionInfluence;
+        private volatile ConcurrentDictionary<Connection, float?[]> ConnectionInfluence;
 
         private readonly Connection[] AllConnections;
 
@@ -34,13 +34,13 @@ namespace NeuralNet.BackpropagationTraining {
             MicroBatchSize = microBatchSize;
 
             //Loop trough all network connections and add them to ConnectionInfluence list
-            ConnectionInfluence = new ConcurrentDictionary<Connection, double?[]>();
+            ConnectionInfluence = new ConcurrentDictionary<Connection, float?[]>();
             var fillAllCollections = new List<Connection>();
             for(int layer = 1; layer < Network.Nodes.Length; layer++) { //Skips input layer
                 for(int index = 0; index < Network.Nodes[layer].Length; index++) {
                     //Loop trough current nodes incomming connections
                     foreach(Connection con in Network.Nodes[layer][index].GetIncommingConnections()) {
-                        ConnectionInfluence.TryAdd(con, new double?[MicroBatchSize]);
+                        ConnectionInfluence.TryAdd(con, new float?[MicroBatchSize]);
                         fillAllCollections.Add(con);
                     }
                 }
@@ -53,7 +53,7 @@ namespace NeuralNet.BackpropagationTraining {
             for(int batchNr = 0; batchNr * MicroBatchSize < expected.Length; batchNr++) {
                 //Reset influence values
                 foreach(var key in AllConnections) {
-                    ConnectionInfluence[key] = new double?[MicroBatchSize];
+                    ConnectionInfluence[key] = new float?[MicroBatchSize];
                 }
                 LogProcess("Reset influence values");
 
@@ -70,9 +70,9 @@ namespace NeuralNet.BackpropagationTraining {
                     //TODO
                     // Following uses the node 'Output', is this ok?
                     // The output depends on current network state, this might be changed when working in parallel (microbatches, see Parallel.For)
-                    double outputInfluence = conInfPair.Sum(d => (d ?? 0) * con.FromNode.Output);
+                    float outputInfluence = conInfPair.Sum(d => (d ?? 0) * con.FromNode.Output);
                     double deltaWeight = -LearningRate * outputInfluence;
-                    con.Weight += deltaWeight;
+                    con.Weight += (float)deltaWeight;
                 }
                 LogProcess("Update weights");
             }
@@ -80,18 +80,18 @@ namespace NeuralNet.BackpropagationTraining {
 
         private void AdjustWeights(InputExpectedResult irp, int microBatchIndex) {
             ResetCurTimer();
-            double[] actual = Network.GetOutputForInput(irp.Input);
-            double[] target = irp.ExpectedOutput;
+            float[] actual = Network.GetOutputForInput(irp.Input);
+            float[] target = irp.ExpectedOutput;
             LogProcess("Load actual / target");
 
             //Set output influence value
             for(int nodeIndex = 0; nodeIndex < Network.Nodes[Network.Nodes.Length - 1].Length; nodeIndex++) {
-                double curTarget = target[nodeIndex];
-                double curActual = actual[nodeIndex];
+                float curTarget = target[nodeIndex];
+                float curActual = actual[nodeIndex];
                 Node curNode = Network.Nodes[Network.Nodes.Length - 1][nodeIndex];
 
                 foreach(Connection toOutputCon in curNode.GetIncommingConnections()) {
-                    double preCalc = CalcOutputInfuence(toOutputCon, curTarget, curActual);
+                    var preCalc = CalcOutputInfuence(toOutputCon, curTarget, curActual);
                     ConnectionInfluence[toOutputCon][microBatchIndex] = preCalc;
                 }
             }
@@ -106,9 +106,9 @@ namespace NeuralNet.BackpropagationTraining {
             LogProcess("Fill ConnectionInfluence values");
         }
 
-        private double CalcOutputInfuence(Connection connection, double expectedOutput, double actualOutput) {
-            double dif = (-(expectedOutput - actualOutput));
-            double outcome = dif * Network.TransferFunction.Derivative(actualOutput);
+        private float CalcOutputInfuence(Connection connection, float expectedOutput, float actualOutput) {
+            var dif = (-(expectedOutput - actualOutput));
+            var outcome = dif * Network.TransferFunction.Derivative(actualOutput);
             return outcome;
         }
 
@@ -116,22 +116,22 @@ namespace NeuralNet.BackpropagationTraining {
         /// Calculates connection influence value IF it is not yet present in ConnectionInfluence dictionary
         /// Stores result in the dictionary and then returns it
         /// </summary>
-        private double GetConnectionInfluence(Connection connection, int microBatchIndex) {
-            double? cur = ConnectionInfluence[connection][microBatchIndex];
+        private float GetConnectionInfluence(Connection connection, int microBatchIndex) {
+            float? cur = ConnectionInfluence[connection][microBatchIndex];
             if(cur.HasValue) {
                 return cur.Value;
             } else {
-                double sumInfluenceOutput = 0;
+                float sumInfluenceOutput = 0f;
                 foreach(var outgoing in connection.ToNode.GetOutgoingConnections()) {
-                    double connectionInfluence = GetConnectionInfluence(outgoing, microBatchIndex);
-                    double curInfluence = connectionInfluence * outgoing.Weight;
+                    float connectionInfluence = GetConnectionInfluence(outgoing, microBatchIndex);
+                    float curInfluence = connectionInfluence * outgoing.Weight;
                     sumInfluenceOutput += curInfluence;
                 }
 
-                double fromOutput = connection.FromNode.Output;
-                double outDeriv = Network.TransferFunction.Derivative(connection.ToNode.Output);
+                float fromOutput = connection.FromNode.Output;
+                float outDeriv = Network.TransferFunction.Derivative(connection.ToNode.Output);
 
-                double influence = sumInfluenceOutput * outDeriv;
+                float influence = sumInfluenceOutput * outDeriv;
                 ConnectionInfluence[connection][microBatchIndex] = influence;
                 return influence;
             }

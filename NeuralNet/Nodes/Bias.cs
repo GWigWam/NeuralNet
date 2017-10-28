@@ -9,7 +9,7 @@ namespace NeuralNet.Nodes {
 
     [DebuggerDisplay("Bias '{Name}' = [{Output}]")]
     public class Bias : Node {
-        public override double Output => 1;
+        public override float Output => 1;
 
         public Bias(string name = "X") : base(name) {
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NeuralNet.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,12 +10,12 @@ namespace NeuralNet {
     public static class NetworkValidation {
 
         /// <param name="checkSuccess">Funcion takes 'expected', 'actual' returns bool wether or not actual can be considerd a success</param>
-        public static ValidationResult Validate(Network network, IEnumerable<InputExpectedResult> inputResults, Func<double[], double[], bool> checkSuccess) {
+        public static ValidationResult Validate(IGetOutput network, IEnumerable<InputExpectedResult> inputResults, Func<float[], float[], bool> checkSuccess) {
             ValidationResult totalResult = null;
             foreach(var cur in inputResults) {
-                double[] actual = network.GetOutputForInput(cur.Input);
+                float[] actual = network.GetOutputForInput(cur.Input);
 
-                double sse = SumSquaredError(cur.ExpectedOutput, actual);
+                float sse = SumSquaredError(cur.ExpectedOutput, actual);
                 bool success = checkSuccess(cur.ExpectedOutput, actual);
 
                 var res = new ValidationResult(sse, success);
@@ -25,15 +26,15 @@ namespace NeuralNet {
             return totalResult;
         }
 
-        public static double SquaredError(double target, double actual) {
+        public static float SquaredError(float target, float actual) {
             var val = Math.Pow(target - actual, 2);
-            return val;
+            return (float)val;
         }
 
-        public static double SumSquaredError(double[] target, double[] actual) {
-            double sum = 0;
+        public static float SumSquaredError(float[] target, float[] actual) {
+            float sum = 0;
             for(int i = 0; i < target.Length; i++) {
-                double curErr = SquaredError(target[i], actual[i]);
+                var curErr = SquaredError(target[i], actual[i]);
                 sum += curErr;
             }
 
@@ -42,9 +43,9 @@ namespace NeuralNet {
     }
 
     public class ValidationResult {
-        private List<double> SSEs;
+        private List<float> SSEs;
 
-        public double AvgSSE => SSEs.Count > 0 ? SSEs.Average() : -1;
+        public float AvgSSE => SSEs.Count > 0 ? SSEs.Average() : -1;
 
         public int EntryCount => SSEs.Count;
 
@@ -55,10 +56,10 @@ namespace NeuralNet {
         public double SuccessPercentage => 100 * Successes / EntryCount;
 
         private ValidationResult() {
-            SSEs = new List<double>();
+            SSEs = new List<float>();
         }
 
-        public ValidationResult(double sse, bool isSuccess) : this() {
+        public ValidationResult(float sse, bool isSuccess) : this() {
             SSEs.Add(sse);
 
             if(isSuccess) {
@@ -66,7 +67,7 @@ namespace NeuralNet {
             }
         }
 
-        public double[] GetSSEs() {
+        public float[] GetSSEs() {
             return SSEs.ToArray();
         }
 

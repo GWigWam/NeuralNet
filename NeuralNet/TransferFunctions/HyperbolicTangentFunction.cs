@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace NeuralNet.TransferFunctions {
 
     public class HyperbolicTangentFunction : TransferFunction {
-        public override double ExtremeMax => 1;
+        public override float ExtremeMax => 1;
 
-        public override double ExtremeMin => -1;
+        public override float ExtremeMin => -1;
 
-        public override double Calculate(double input) {
+        public override float Calculate(float input) {
             var val = Math.Tanh(input);
-            return val;
+            return (float)val;
         }
 
-        public override double Derivative(double input) {
+        public override float Derivative(float input) {
             var val = 1.0 - Math.Pow(Math.Tanh(input), 2);
-            return val;
+            return (float)val;
         }
     }
 }

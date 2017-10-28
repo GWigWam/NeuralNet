@@ -14,16 +14,16 @@ namespace IrisSpecies {
         private int ExtremeMin = -1;
         private int ExtremeMax = 1;
 
-        public double SepalLength;
-        public double SepalWidth;
-        public double PetalLength;
-        public double PetalWidth;
+        public float SepalLength;
+        public float SepalWidth;
+        public float PetalLength;
+        public float PetalWidth;
         public IrisSpecies Species;
 
-        public double[] AsInput => new double[] { SepalLength, SepalWidth, PetalLength, PetalWidth };
-        public double[] AsOutput => (Species == IrisSpecies.Setosa) ? new double[] { ExtremeMax, ExtremeMin, ExtremeMin } : (Species == IrisSpecies.Versicolor) ? new double[] { ExtremeMin, ExtremeMax, ExtremeMin } : new double[] { ExtremeMin, ExtremeMin, ExtremeMax };
+        public float[] AsInput => new float[] { SepalLength, SepalWidth, PetalLength, PetalWidth };
+        public float[] AsOutput => (Species == IrisSpecies.Setosa) ? new float[] { ExtremeMax, ExtremeMin, ExtremeMin } : (Species == IrisSpecies.Versicolor) ? new float[] { ExtremeMin, ExtremeMax, ExtremeMin } : new float[] { ExtremeMin, ExtremeMin, ExtremeMax };
 
-        public IrisEntry(double sl, double sw, double pl, double pw, IrisSpecies species) {
+        public IrisEntry(float sl, float sw, float pl, float pw, IrisSpecies species) {
             SepalLength = sl;
             SepalWidth = sw;
             PetalLength = pl;
@@ -31,7 +31,7 @@ namespace IrisSpecies {
             Species = species;
         }
 
-        public static IrisSpecies SpeciesFromOutput(double[] output) {
+        public static IrisSpecies SpeciesFromOutput(float[] output) {
             double maxVal = int.MinValue;
             int maxIndex = -1;
             for(int i = 0; i < output.Length; i++) {
@@ -57,7 +57,7 @@ namespace IrisSpecies {
             }
         }
 
-        public static bool IsOutputSuccess(double[] expected, double[] actual) {
+        public static bool IsOutputSuccess(float[] expected, float[] actual) {
             return SpeciesFromOutput(actual) == SpeciesFromOutput(expected);
         }
     }

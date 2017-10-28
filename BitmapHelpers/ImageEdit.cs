@@ -106,9 +106,9 @@ namespace BitmapHelper {
             return destImage;
         }
 
-        public static double[] GreyValues(this Bitmap bmp, double min, double max) {
+        public static float[] GreyValues(this Bitmap bmp, float min, float max) {
             int bitPerPixel = Image.GetPixelFormatSize(bmp.PixelFormat);
-            var greyVals = new double[bmp.Width * bmp.Height];
+            var greyVals = new float[bmp.Width * bmp.Height];
 
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, bmp.PixelFormat);
             unsafe
@@ -144,7 +144,7 @@ namespace BitmapHelper {
             return greyVals;
         }
 
-        private static double ShiftRange(double value, double orgMin, double orgMax, double newMin, double newMax) {
+        private static float ShiftRange(float value, float orgMin, float orgMax, float newMin, float newMax) {
             var val = (((value - orgMin) / (orgMax - orgMin)) * (newMax - newMin)) + newMin;
             return val;
         }

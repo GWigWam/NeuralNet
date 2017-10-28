@@ -28,8 +28,8 @@ namespace Test {
 
         [TestMethod]
         public void TestConnection() {
-            double weight = 2;
-            double input = 5;
+            float weight = 2;
+            float input = 5;
             var inp = new Input(input);
             var outp = new Perceptron(new SigmoidFunction(), "Output");
             var wc = Connection.Create(weight, inp, outp);
@@ -40,14 +40,14 @@ namespace Test {
 
         [TestMethod]
         public void TestPerceptronCaching() {
-            double local1 = -10;
-            double local2 = -5;
+            float local1 = -10;
+            float local2 = -5;
 
             var in1 = new Input(local1, "Input1");
             var in2 = new Input(local2, "Input2");
             var p = new Perceptron(new SigmoidFunction());
 
-            Connection.Create(0.5, in1, p);
+            Connection.Create(0.5f, in1, p);
             Connection.Create(1, in2, p);
 
             Assert.IsTrue(p.Output < 0.1);
@@ -84,8 +84,8 @@ namespace Test {
         [TestMethod]
         public void TestNetworkOutput() {
             var rand = new Random();
-            double input = (double)(rand.NextDouble());
-            double weight = (double)(rand.NextDouble());
+            var input = (float)(rand.NextDouble());
+            var weight = (float)(rand.NextDouble());
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -110,8 +110,8 @@ namespace Test {
         [TestMethod]
         public void TestGetInputResult() {
             var rand = new Random();
-            double input = (double)(rand.NextDouble() * 100 + 1);
-            double weight = (double)(rand.NextDouble() * 2);
+            var input = (float)(rand.NextDouble() * 100 + 1);
+            var weight = (float)(rand.NextDouble() * 2);
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -139,9 +139,9 @@ namespace Test {
 
         [TestMethod]
         public void TestBias() {
-            double input = 0.3;
-            double inpToOutWeight = 0.4;
-            double biasToOutWeight = 0.5;
+            float input = 0.3f;
+            float inpToOutWeight = 0.4f;
+            float biasToOutWeight = 0.5f;
 
             var sigmoid = new SigmoidFunction();
             var nw = new Network(sigmoid, false);
@@ -196,16 +196,16 @@ namespace Test {
             var net = new Network(sigmoid, true);
             net.FillNetwork(2, 2, 2);
 
-            net.Nodes[0][0].GetOutgoingConnections()[0].Weight = .15;
-            net.Nodes[0][0].GetOutgoingConnections()[1].Weight = .2;
-            net.Nodes[0][1].GetOutgoingConnections()[0].Weight = .25;
-            net.Nodes[0][1].GetOutgoingConnections()[1].Weight = .3;
-            net.Nodes[1][0].GetOutgoingConnections()[0].Weight = .4;
-            net.Nodes[1][0].GetOutgoingConnections()[1].Weight = .45;
-            net.Nodes[1][1].GetOutgoingConnections()[0].Weight = .5;
-            net.Nodes[1][1].GetOutgoingConnections()[1].Weight = .55;
+            net.Nodes[0][0].GetOutgoingConnections()[0].Weight = .15f;
+            net.Nodes[0][0].GetOutgoingConnections()[1].Weight = .20f;
+            net.Nodes[0][1].GetOutgoingConnections()[0].Weight = .25f;
+            net.Nodes[0][1].GetOutgoingConnections()[1].Weight = .30f;
+            net.Nodes[1][0].GetOutgoingConnections()[0].Weight = .40f;
+            net.Nodes[1][0].GetOutgoingConnections()[1].Weight = .45f;
+            net.Nodes[1][1].GetOutgoingConnections()[0].Weight = .50f;
+            net.Nodes[1][1].GetOutgoingConnections()[1].Weight = .55f;
 
-            var expected = new InputExpectedResult(new double[] { .05, .1 }, new double[] { .01, .99 });
+            var expected = new InputExpectedResult(new float[] { .05f, .10f }, new float[] { .01f, .99f });
 
             var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
 
@@ -221,34 +221,48 @@ namespace Test {
         public void TestTraining2() {
             var sigmoid = new SigmoidFunction();
 
-            var net = new Network(sigmoid, true);
+            var net = new Network2(sigmoid);
             net.FillNetwork(2, 2, 2);
 
-            net.Nodes[0][0].GetOutgoingConnections()[0].Weight = .15;
-            net.Nodes[0][0].GetOutgoingConnections()[1].Weight = .25;
-            net.Nodes[0][1].GetOutgoingConnections()[0].Weight = .20;
-            net.Nodes[0][1].GetOutgoingConnections()[1].Weight = .30;
-            net.Nodes[1][0].GetOutgoingConnections()[0].Weight = .40;
-            net.Nodes[1][0].GetOutgoingConnections()[1].Weight = .50;
-            net.Nodes[1][1].GetOutgoingConnections()[0].Weight = .45;
-            net.Nodes[1][1].GetOutgoingConnections()[1].Weight = .55;
+            net.Weights[0][0][0] = .15f;
+            net.Weights[0][0][1] = .25f;
+            net.Weights[0][1][0] = .20f;
+            net.Weights[0][1][1] = .30f;
+            net.Weights[1][0][0] = .40f;
+            net.Weights[1][0][1] = .50f;
+            net.Weights[1][1][0] = .45f;
+            net.Weights[1][1][1] = .55f;
 
-            var biasOut = net.Bias.GetOutgoingConnections();
-            biasOut[0].Weight = .35; // Bias --> H0.0
-            biasOut[1].Weight = .35; // Bias --> H0.1
-            biasOut[2].Weight = .60; // Bias --> O.0
-            biasOut[3].Weight = .60; // Bias --> O.1
+            //var biasOut = net.Bias.GetOutgoingConnections();
+            net.BiasWeights[0][0] = .35f; // Bias --> H0.0
+            net.BiasWeights[0][1] = .35f; // Bias --> H0.1
+            net.BiasWeights[1][0] = .60f; // Bias --> O.0
+            net.BiasWeights[1][1] = .60f; // Bias --> O.1
 
-            var expected = new InputExpectedResult(new double[] { .05, .1 }, new double[] { .01, .99 });
+            var expected = new InputExpectedResult(new float[] { .05f, .10f }, new float[] { .01f, .99f });
 
-            var before = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+            var res = net.GetValuesForInput(expected.Input.Select(dbl => (float)dbl).ToArray());
 
             var bp = new Backpropagate2(net, 0.5);
-            bp.Train(new InputExpectedResult[] { expected });
 
-            var after = NetworkValidation.Validate(net, new InputExpectedResult[] { expected }, (a, b) => true);
+            for (int t = 0; t < 10000; t++) {
+                bp.Train(new InputExpectedResult[] { expected });
+            }
+            var res2 = net.GetValuesForInput(expected.Input.Select(dbl => (float)dbl).ToArray());
 
-            Assert.IsTrue(before.AvgSSE > after.AvgSSE);
+            Assert.IsTrue(Math.Abs(res2[2][0] - 0.015912) < 0.0001);
+            Assert.IsTrue(Math.Abs(res2[2][1] - 0.984064) < 0.0001);
+        }
+
+        [TestMethod]
+        public void TestTraining22() {
+            var net = new Network2(new SigmoidFunction());
+            net.FillNetwork(2, 2, 12, 24, 12); // (2 * 12) + (12 * 24) + (24 * 12) + (12 * 2) = 624 connections
+            var bp = new Backpropagate2(net, 0.5);
+
+            for (int t = 0; t < 10000; t++) {
+                bp.Train(new InputExpectedResult[] { new InputExpectedResult(new float[] { .05f, .10f }, new float[] { .01f, .99f }) });
+            }
         }
 
         [TestMethod]

@@ -111,11 +111,11 @@ namespace LazyImgLoader {
         }
 
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
-            double[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
+            float[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
             if(OnlyNumbers) {
                 var nr = int.Parse(data.Item2.ToString());
-                var outp = new double[10];
+                var outp = new float[10];
                 for(int i = 0; i < outp.Length; i++) {
                     outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
                 }

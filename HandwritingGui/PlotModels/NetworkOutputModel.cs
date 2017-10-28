@@ -15,7 +15,7 @@ namespace HandwritingGui.PlotModels {
             get; private set;
         }
 
-        public NetworkOutputModel(double[] output, double min, double max) {
+        public NetworkOutputModel(float[] output, float min, float max) {
             Model = new PlotModel();
             var catAxis = new CategoryAxis() { Position = AxisPosition.Bottom };
             catAxis.LabelField = "Name";
