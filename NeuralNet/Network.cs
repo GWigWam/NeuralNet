@@ -1,4 +1,5 @@
-﻿using NeuralNet.Connections;
+﻿using NeuralNet.Base;
+using NeuralNet.Connections;
 using NeuralNet.Nodes;
 using NeuralNet.TransferFunctions;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NeuralNet {
 
-    public class Network {
+    public class Network : IGetOutput {
         private Random random;
 
         public TransferFunction TransferFunction {
@@ -57,15 +58,15 @@ namespace NeuralNet {
 
                     //Create input connections
                     foreach(var inp in Nodes[layerIndex - 1]) {
-                        double weight = 0;
+                        float weight = 0;
                         if(layerIndex - 1 == 0) { //Input --> 1st hidden
-                            weight = MathHelper.GuassianRandom(Math.Sqrt(1.0 / 3.0), 0);
+                            weight = (float)MathHelper.GuassianRandom(Math.Sqrt(1.0 / 3.0), 0);
                         }
                         Connection.Create(weight, inp, newPerceptron);
                     }
 
                     if(Bias != null) {
-                        Connection.Create(0.5, Bias, newPerceptron);
+                        Connection.Create(0.5f, Bias, newPerceptron);
                     }
 
                     curLayer.Add(newPerceptron);
@@ -74,7 +75,7 @@ namespace NeuralNet {
             }
         }
 
-        public double[][] GetValuesForInput(params double[] input) {
+        public float[][] GetValuesForInput(params float[] input) {
             if (input.Length != Nodes[0].Length) {
                 throw new ArgumentOutOfRangeException(nameof(input));
             }
@@ -86,20 +87,20 @@ namespace NeuralNet {
             return GetValues(true);
         }
 
-        public double[][] GetValues(bool resetCache = true) {
+        public float[][] GetValues(bool resetCache = true) {
             if (resetCache) {
                 ResetPerceptronCache();
             }
             return Nodes.Select(lay => lay.Select(n => n.Output).ToArray()).ToArray();
         }
 
-        public double[] GetOutputForInput(params double[] input) => GetValuesForInput(input)[Nodes.Length - 1];
+        public float[] GetOutputForInput(params float[] input) => GetValuesForInput(input)[Nodes.Length - 1];
 
-        public double[] GetOutput(bool resetCache = true) => GetValues(resetCache)[Nodes.Length - 1];
+        public float[] GetOutput(bool resetCache = true) => GetValues(resetCache)[Nodes.Length - 1];
 
         public void RandomizeWeights() {
             foreach(Connection connection in Nodes.SelectMany(nodeAr => nodeAr).SelectMany(Node => Node.GetIncommingConnections())) {
-                connection.Weight = random.NextDouble();
+                connection.Weight = (float)random.NextDouble();
             }
         }
 
