@@ -138,7 +138,7 @@ namespace HandwritingGui {
         }
 
         public void Dispose() {
-            TrainThread.Abort();
+            TrainThread?.Abort();
         }
     }
 }
