@@ -23,13 +23,16 @@ namespace NeuralNet.BackpropagationTraining {
                                 
                 // Calculate weight errors
                 var weightErrors = new ConErr[Network.LayerCount - 1][][]; // [Layer] [FromNode] [ToNode]
+                var biasErrors = new ConErr[Network.LayerCount - 1][]; // [Layer - 1] [Node]
 
                 for (int layNr = weightErrors.Length - 1; layNr >= 0; layNr--) { //Starts at the output, this is BACKprop
                     int curLayHeight = Network.GetLayerHeight(layNr);
                     int nextLayHeight = Network.GetLayerHeight(layNr + 1);
 
                     weightErrors[layNr] = new ConErr[curLayHeight][];
+                    biasErrors[layNr] = new ConErr[nextLayHeight];
 
+                    // Calc weight error
                     for (int fromNodeNr = 0; fromNodeNr < curLayHeight; fromNodeNr++) {
                         weightErrors[layNr][fromNodeNr] = new ConErr[nextLayHeight];
                         for (int toNodeNr = 0; toNodeNr < nextLayHeight; toNodeNr++) {
@@ -49,6 +52,11 @@ namespace NeuralNet.BackpropagationTraining {
                             var conInputValue = networkState[layNr][fromNodeNr];
 
                             weightErrors[layNr][fromNodeNr][toNodeNr] = new ConErr(outputError, (float)toNodeDer, conInputValue);
+
+                            // Calc bias error
+                            if (fromNodeNr == 0) {
+                                biasErrors[layNr][toNodeNr] = new ConErr(outputError, toNodeDer, 1 /*Bias input is alway 1*/);
+                            }
                         }
                     }
                 }
@@ -57,11 +65,20 @@ namespace NeuralNet.BackpropagationTraining {
                 for (int l = 0; l < weightErrors.Length; l++) {
                     for (int f = 0; f < weightErrors[l].Length; f++) {
                         for (int t = 0; t < weightErrors[l][f].Length; t++) {
-                            var curErr = weightErrors[l][f][t];
-                            var error = curErr.OutputError * curErr.OutputDerivative * curErr.ConnectionInputValue;
-                            var deltaWeight = error * LearningRate;
+                            var nErrEntry = weightErrors[l][f][t];
+                            var nError = nErrEntry.OutputError * nErrEntry.OutputDerivative * nErrEntry.ConnectionInputValue;
+                            var nDeltaWeight = nError * LearningRate;
                             
-                            Network.Weights[l][f][t] -= (float)deltaWeight;
+                            Network.Weights[l][f][t] -= (float)nDeltaWeight;
+
+                            // Adjust bias
+                            if (f == 0) {
+                                var bErrEntry = biasErrors[l][t];
+                                var bError = bErrEntry.OutputError * bErrEntry.OutputDerivative * bErrEntry.ConnectionInputValue;
+                                var bDeltaWeight = bError * LearningRate;
+
+                                Network.BiasWeights[l][t] -= (float)bDeltaWeight;
+                            }
                         }
                     }
                 }

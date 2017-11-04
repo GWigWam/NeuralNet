@@ -11,6 +11,8 @@ namespace NeuralNet.Base {
 
         float[][][] Weights { get; }
 
+        float[][] BiasWeights { get; }
+
         int LayerCount { get; }
         int HiddenLayerCount { get; }
 
