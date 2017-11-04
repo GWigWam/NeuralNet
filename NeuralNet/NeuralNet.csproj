@@ -65,7 +65,6 @@
     <Compile Include="BackpropagationTraining\Backpropagate.cs" />
     <Compile Include="BackpropagationTraining\Backpropagate2.cs" />
     <Compile Include="Base\IGetOutput.cs" />
-    <Compile Include="Base\INetwork.cs" />
     <Compile Include="InputExpectedResult.cs" />
     <Compile Include="MathHelper.cs" />
     <Compile Include="Network2.cs" />

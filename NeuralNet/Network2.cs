@@ -7,14 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NeuralNet {
-    public class Network2 : INetwork {
+    public class Network2 {
         public TransferFunction TransferFunction { get; }
 
         public int LayerCount => Weights.Length + 1;
         public int HiddenLayerCount => Weights.Length - 1;
 
+        /// <summary>
+        /// Weights of connections between layers. Index: [FromLayer][FromNode][ToNode]
+        /// </summary>
         public float[][][] Weights { get; private set; }
-
+        
+        /// <summary>
+        /// Weights of connections between bias and nodes. Index [Layer (ex. input layer)][ToNode]
+        /// </summary>
         public float[][] BiasWeights { get; private set; }
 
         public int[] LayerHeights { get; private set; }
@@ -48,6 +54,11 @@ namespace NeuralNet {
             LayerHeights = new[] { nrInputs }.Concat(hiddenLayerHeights).Concat(new[] { nrOutputs }).ToArray();
         }
 
+        /// <summary>
+        /// Calculate network state for given input
+        /// </summary>
+        /// <param name="input">Input values for the input layer</param>
+        /// <returns>Node output values. Index: [Layer][Node]</returns>
         public float[][] GetValuesForInput(params float[] input) {
             float[][] layerResults = new float[LayerCount][];
             layerResults[0] = input;
@@ -75,6 +86,11 @@ namespace NeuralNet {
             return layerResults;
         }
 
+        /// <summary>
+        /// Get outut node values for given input
+        /// </summary>
+        /// <param name="input">Input values for the input layer</param>
+        /// <returns>Ouput nodes values. Index: [Node]</returns>
         public float[] GetOutputForInput(params float[] input) => GetValuesForInput(input).Last();
 
         public int GetLayerHeight(int layerNr) => LayerHeights[layerNr];
