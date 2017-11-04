@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace NeuralNet {
-    public class Network2 {
+    public class Network2 : IGetOutput {
         public TransferFunction TransferFunction { get; }
 
         public int LayerCount => Weights.Length + 1;

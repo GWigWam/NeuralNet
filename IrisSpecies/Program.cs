@@ -17,8 +17,8 @@ namespace IrisSpecies {
 
         private static TransferFunction Transfer = new HyperbolicTangentFunction();
 
-        //private static INetwork Network = new Network2(Transfer);
-        private static Network Network = new Network(Transfer, true);
+        //private static Network Network = new Network(Transfer, true);
+        private static Network2 Network = new Network2(Transfer);
 
         private static void Main(string[] args) {
             var data = DataReader.ReadFromFile("data/iris.data")/*.OrderBy(i => random.Next())*/;
@@ -38,13 +38,13 @@ namespace IrisSpecies {
             
             var trainData = inputAndExpectedResuls.ToArray();
 
-            //var Bp = new Backpropagate2(Network, 0.5);
-            var Bp = new Backpropagate(Network, 0.5);
+            //var Bp = new Backpropagate(Network, 0.5);
+            var Bp = new Backpropagate2(Network, 0.5f);
 
             int trains = 0;
             double score = 0;
             var start = Environment.TickCount;
-            while(score < 90) {
+            while(score < 98) {
                 trains++;
                 Bp.Train(trainData.OrderBy(i => random.Next()).ToArray());
 
