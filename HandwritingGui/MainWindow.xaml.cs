@@ -120,6 +120,9 @@ namespace HandwritingGui {
                 return;
             }
 
+            var loadNumbers = (Rb_Charset_All.IsChecked ?? false) || (Rb_Charset_Digits.IsChecked ?? false);
+            var loadChars = (Rb_Charset_All.IsChecked ?? false) || (Rb_Charset_Alphabetic.IsChecked ?? false);
+
             var match = new Regex(@"^(?<inp>(\d|X)+)\*(?<hid>(\d|X)+\*)+(?<out>(\d|X)+)$").Match(Tb_NetworkDimensions.Text);
             if(!match.Success) {
                 Log("Invalid network dimension, invalid format", Colors.Red);
@@ -130,7 +133,7 @@ namespace HandwritingGui {
                 Log("Invalid network dimension: Input", Colors.Red);
                 return;
             }
-            int expectedOutputNr = Rb_Charset_Alphabetic.IsChecked.Value ? 26 : Rb_Charset_Digits.IsChecked.Value ? 10 : 36;
+            int expectedOutputNr = Rb_Charset_Alphabetic.IsChecked.Value ? (26 * 2) : Rb_Charset_Digits.IsChecked.Value ? 10 : ((26 * 2) + 10);
             if(match.Groups?["out"].Value != expectedOutputNr.ToString()) {
                 Log("Invalid network dimension: Output", Colors.Red);
                 return;
@@ -159,7 +162,7 @@ namespace HandwritingGui {
 
             Log("Creating NeuralNet...");
             Task.Run(() => {
-                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray());
+                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray(), loadNumbers, loadChars);
             }).ContinueWith((t) => {
                 Dispatcher.Invoke(() => {
                     if(t.IsCompleted) {
@@ -186,7 +189,13 @@ namespace HandwritingGui {
 
         private void Rb_Charset_Checked(object sender, RoutedEventArgs e) {
             if(IsInitialized) {
-                Tb_NetworkDimensions.Text = new Regex(@"\*(\d+|X)$").Replace(Tb_NetworkDimensions.Text, "*" + ((string)((RadioButton)sender).Tag));
+                int nr =
+                    Rb_Charset_Digits.IsChecked ?? false ? 10 :
+                    Rb_Charset_Alphabetic.IsChecked ?? false ? (26 * 2) :
+                    Rb_Charset_All.IsChecked ?? false ? ((26 * 2) + 10) :
+                        -1;
+
+                Tb_NetworkDimensions.Text = new Regex(@"\*(\d+|X)$").Replace(Tb_NetworkDimensions.Text, "*" + nr);
             }
         }
 
@@ -203,8 +212,6 @@ namespace HandwritingGui {
         private void RecogImgGrid_Drop(object sender, DragEventArgs e) {
             RecogImgGrid.Background = Brushes.Transparent;
             if(IsValidBMPImgDrop(e)) {
-                Log("Image dropped");
-
                 string file = (e.Data.GetData(DataFormats.FileDrop) as string[])?[0];
                 if(file != null) {
                     System.Drawing.Bitmap img = ImageReader.ReadImg(file, true, true, Network.ImageDimensions);
@@ -225,6 +232,8 @@ namespace HandwritingGui {
                     Tb_ClickImgHint.Visibility = Visibility.Hidden;
 
                     var output = Network.Network.GetOutputForInput(greyVals);
+                    var maxIndex = output.Select((val, indx) => new { val, indx }).Aggregate((i0, i1) => i0.val > i1.val ? i0 : i1).indx;
+                    Log($"Image dropped, max index: {maxIndex}");
 
                     OxyPlot_NetworkOut.Model = new PlotModels.NetworkOutputModel(output, Network.TransferFunc.ExtremeMin, Network.TransferFunc.ExtremeMax).Model;
                     OxyPlot_NetworkOut.InvalidatePlot(true);

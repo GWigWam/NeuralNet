@@ -10,16 +10,15 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LazyImgLoader {
-
+    
     public class LazyTrainImgLoader {
 
         public int PreLoad {
             get; set;
         } = 100;
 
-        public bool OnlyNumbers {
-            get;
-        }
+        private bool LoadNumbers { get; }
+        private bool LoadCharacters { get; }
 
         public bool CropWhitespace {
             get;
@@ -56,10 +55,11 @@ namespace LazyImgLoader {
         public int Index => curIndex;
         public int FileCount => Files.Length;
 
-        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool cropWhitespace, bool highQuality, int dimensions, int batchSize, bool startPreLoad = true, bool onlyNumbers = true) {
+        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool cropWhitespace, bool highQuality, int dimensions, int batchSize, bool loadNumbers, bool loadChars, bool startPreLoad = true) {
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
             Transfer = transfer;
-            OnlyNumbers = onlyNumbers;
+            LoadNumbers = loadNumbers;
+            LoadCharacters = loadChars;
             CropWhitespace = cropWhitespace;
             HighQuality = highQuality;
             Dimensions = dimensions;
@@ -104,7 +104,7 @@ namespace LazyImgLoader {
             foreach(var file in files) {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
                 char curChar;
-                if(char.TryParse(readChar, out curChar) && (!OnlyNumbers || char.IsNumber(curChar))) {
+                if(char.TryParse(readChar, out curChar) && ((LoadNumbers && char.IsNumber(curChar) || (LoadCharacters && char.IsLetter(curChar))))) {
                     yield return new Tuple<FileInfo, char>(file, curChar);
                 }
             }
@@ -113,17 +113,20 @@ namespace LazyImgLoader {
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
             float[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
-            if(OnlyNumbers) {
-                var nr = int.Parse(data.Item2.ToString());
-                var outp = new float[10];
-                for(int i = 0; i < outp.Length; i++) {
-                    outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
-                }
+            var utf16 = Convert.ToInt32(data.Item2);
 
-                return new InputExpectedResult(inp, outp);
-            } else {
-                throw new NotImplementedException();
+            var nr =
+                utf16 >= 97 ? utf16 - 97 :
+                utf16 >= 65 ? utf16 - 65 :
+                utf16 >= 48 ? utf16 - 48 :
+                    throw new Exception($"Cannot handle char '{data.Item2}'");
+
+            var outp = new float[(LoadCharacters ? 52 : 0) + (LoadNumbers ? 10 : 0)];
+            for(int i = 0; i < outp.Length; i++) {
+                outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
             }
+
+            return new InputExpectedResult(inp, outp);
         }
 
         private void StartPreLoad() {

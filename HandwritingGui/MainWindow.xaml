@@ -55,9 +55,9 @@
                     <!--Characterset-->
                     <Label Content="Characterset:" Grid.Column="0" Grid.Row="5" />
                     <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="5">
-                        <RadioButton x:Name="Rb_Charset_Digits" Tag="10" Content="Digits" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
-                        <RadioButton x:Name="Rb_Charset_Alphabetic" Tag="26" Content="Alphabetic" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
-                        <RadioButton x:Name="Rb_Charset_All" Tag="36" Content="All" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
+                        <RadioButton x:Name="Rb_Charset_Digits" Content="Digits" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
+                        <RadioButton x:Name="Rb_Charset_Alphabetic" Content="Alphabetic" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
+                        <RadioButton x:Name="Rb_Charset_All" Content="All" VerticalAlignment="Center" Margin="2" GroupName="Charset" Checked="Rb_Charset_Checked" />
                     </StackPanel>
                     <!--Transfer function-->
                     <Label Content="Transer Function:" Grid.Column="0" Grid.Row="6" />

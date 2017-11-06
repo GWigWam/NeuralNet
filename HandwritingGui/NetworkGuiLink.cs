@@ -56,7 +56,7 @@ namespace HandwritingGui {
             get; private set;
         }
 
-        public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights) {
+        public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights, bool loadNumbers, bool loadChars) {
             switch(funcType) {
                 case TransferFunctionType.Sigmoid:
                 TransferFunc = new SigmoidFunction();
@@ -68,7 +68,7 @@ namespace HandwritingGui {
             }
             ImageDimensions = imgDim;
 
-            ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize/*, TODO: Support non-digits*/);
+            ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize, loadNumbers, loadChars);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImgCount"));
             InitNetwork(learnRate, microBatchsize, inputHeight, outputHeight, hiddenHeights);
         }
