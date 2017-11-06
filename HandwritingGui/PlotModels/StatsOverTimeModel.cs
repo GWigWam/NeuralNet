@@ -19,7 +19,7 @@ namespace HandwritingGui.PlotModels {
         public StatsOverTimeModel() {
             Model = new PlotModel();
             Model.Axes.Add(new LinearAxis() { Position = AxisPosition.Bottom, Title = "Batch", MinorStep = 1 });
-            Model.Axes.Add(new LinearAxis() { Key = "SSE", Position = AxisPosition.Left, Title = "SSE" });
+            Model.Axes.Add(new LinearAxis() { Key = "SSE", Position = AxisPosition.Left, Title = "SSE", Minimum = 0, MajorStep = 1 });
             Model.Axes.Add(new LinearAxis() { Key = "Suc", Position = AxisPosition.Right, Title = "Success %", Minimum = -1, Maximum = 101, MinorStep = 1 });
 
             SSE = new LineSeries() { YAxisKey = "SSE", Title = "SSE" };

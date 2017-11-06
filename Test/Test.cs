@@ -243,22 +243,22 @@ namespace Test {
 
             var res = net.GetValuesForInput(expected.Input.Select(dbl => (float)dbl).ToArray());
 
-            var bp = new Backpropagate2(net, 0.5);
+            var bp = new Backpropagate2(net, 0.5f);
 
             for (int t = 0; t < 10000; t++) {
                 bp.Train(new InputExpectedResult[] { expected });
             }
             var res2 = net.GetValuesForInput(expected.Input.Select(dbl => (float)dbl).ToArray());
 
-            Assert.IsTrue(Math.Abs(res2[2][0] - 0.015912) < 0.0001);
-            Assert.IsTrue(Math.Abs(res2[2][1] - 0.984064) < 0.0001);
+            Assert.IsTrue(Math.Abs(res2[2][0] - 0.01) < 0.002);
+            Assert.IsTrue(Math.Abs(res2[2][1] - 0.99) < 0.002);
         }
 
         [TestMethod]
         public void TestTraining22() {
             var net = new Network2(new SigmoidFunction());
             net.FillNetwork(2, 2, 12, 24, 12); // (2 * 12) + (12 * 24) + (24 * 12) + (12 * 2) = 624 connections
-            var bp = new Backpropagate2(net, 0.5);
+            var bp = new Backpropagate2(net, 0.5f);
 
             for (int t = 0; t < 10000; t++) {
                 bp.Train(new InputExpectedResult[] { new InputExpectedResult(new float[] { .05f, .10f }, new float[] { .01f, .99f }) });

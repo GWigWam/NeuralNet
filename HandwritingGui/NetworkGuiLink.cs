@@ -111,7 +111,7 @@ namespace HandwritingGui {
         }
 
         private void TrainLoop() {
-            var validationData = ImgLoader.SimpleGet(0, 100).ToArray();
+            var validationData = ImgLoader.SimpleGet(0, 500).ToArray();
             bool doTrain = Train;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
             while(true) {
