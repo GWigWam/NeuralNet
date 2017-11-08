@@ -56,6 +56,8 @@ namespace HandwritingGui {
             get; private set;
         }
 
+        public int MicroBatchSize { get; set; }
+
         public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights, bool loadNumbers, bool loadChars) {
             switch(funcType) {
                 case TransferFunctionType.Sigmoid:
@@ -67,13 +69,14 @@ namespace HandwritingGui {
                 break;
             }
             ImageDimensions = imgDim;
+            MicroBatchSize = microBatchsize;
 
             ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize, loadNumbers, loadChars);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImgCount"));
-            InitNetwork(learnRate, microBatchsize, inputHeight, outputHeight, hiddenHeights);
+            InitNetwork(learnRate, inputHeight, outputHeight, hiddenHeights);
         }
 
-        private void InitNetwork(double learnRate, int microBatchsize, int inputHeight, int outputHeight, int[] hiddenHeights) {
+        private void InitNetwork(double learnRate, int inputHeight, int outputHeight, int[] hiddenHeights) {
             //Network = new Network(TransferFunc, true);
             Network = new Network2(TransferFunc);
             Network.FillNetwork(inputHeight, outputHeight, hiddenHeights);
@@ -118,7 +121,7 @@ namespace HandwritingGui {
                 if(doTrain) {
                     var trainData = ImgLoader.GetNextBatch();
 
-                    BackpropTrain.Train(trainData);
+                    BackpropTrain.Train(trainData, MicroBatchSize);
 
                     var stats = NetworkValidation.Validate(Network, validationData, IsImgRecogSuccess);
                     StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
