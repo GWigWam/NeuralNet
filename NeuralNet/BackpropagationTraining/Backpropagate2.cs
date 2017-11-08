@@ -53,7 +53,8 @@ namespace NeuralNet.BackpropagationTraining {
             }
 
             // Calculate weight errors foreach training entry in the mini-batch
-            for (int trainNr = 0; trainNr < trainSetSize; trainNr++) {
+            //for (int trainNr = 0; trainNr < trainSetSize; trainNr++) {
+            Parallel.For(0, trainSetSize, trainNr => {
                 var trainingEntry = miniBatch[trainNr];
                 var networkState = Network.GetValuesForInput(trainingEntry.Input);
 
@@ -62,7 +63,7 @@ namespace NeuralNet.BackpropagationTraining {
                 for (int layNr = weightErrors.Length; --layNr >= 0;) {
                     for (int fromNodeNr = 0; fromNodeNr < weightErrors[layNr].Length; fromNodeNr++) {
                         for (int toNodeNr = 0; toNodeNr < weightErrors[layNr][fromNodeNr].Length; toNodeNr++) {
-                            
+
                             float outputError;
                             if (layNr == weightErrors.Length - 1) {
                                 // Error of connection going to the output layers is based on expected vs actual output
@@ -89,7 +90,7 @@ namespace NeuralNet.BackpropagationTraining {
                         }
                     }
                 }
-            }
+            });
 
             //Update weights based on errors
             for (int layerNr = 0; layerNr < weightLayerCount; layerNr++) {
