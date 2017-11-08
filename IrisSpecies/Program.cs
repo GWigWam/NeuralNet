@@ -46,7 +46,8 @@ namespace IrisSpecies {
             var start = Environment.TickCount;
             while(score < 98) {
                 trains++;
-                Bp.Train(trainData.OrderBy(i => random.Next()).ToArray());
+
+                Bp.Train(trainData.OrderBy(i => random.Next()).ToArray(), 1);
 
                 var stats = NetworkValidation.Validate(Network, inputAndExpectedResuls, IrisEntry.IsOutputSuccess);
                 score = stats.SuccessPercentage;
