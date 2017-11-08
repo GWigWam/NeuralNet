@@ -12,11 +12,6 @@ using System.Threading.Tasks;
 namespace LazyImgLoader {
     
     public class LazyTrainImgLoader {
-
-        public int PreLoad {
-            get; set;
-        } = 100;
-
         private bool LoadNumbers { get; }
         private bool LoadCharacters { get; }
 
@@ -113,20 +108,22 @@ namespace LazyImgLoader {
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
             float[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
-            var utf16 = Convert.ToInt32(data.Item2);
-
-            var nr =
-                utf16 >= 97 ? utf16 - 97 :
-                utf16 >= 65 ? utf16 - 65 :
-                utf16 >= 48 ? utf16 - 48 :
-                    throw new Exception($"Cannot handle char '{data.Item2}'");
-
+            var nr = charToNr(data.Item2);
             var outp = new float[(LoadCharacters ? 52 : 0) + (LoadNumbers ? 10 : 0)];
             for(int i = 0; i < outp.Length; i++) {
                 outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
             }
 
             return new InputExpectedResult(inp, outp);
+        }
+
+        private int charToNr(char c) {
+            var utf16 = Convert.ToInt32(c);
+            return
+                utf16 >= 97 ? utf16 - 97 + (LoadCharacters ? 0 : throw new Exception("Not supposed to load chars")) :
+                utf16 >= 65 ? utf16 - 65 + (LoadCharacters ? 26 : throw new Exception("Not supposed to load chars")) :
+                utf16 >= 48 ? utf16 - 48 + (LoadNumbers ? (LoadCharacters ? 26 + 26 : 0) : throw new Exception("Not supposed to load nrs")) :
+                    throw new Exception($"Cannot handle char '{c}'");
         }
 
         private void StartPreLoad() {
