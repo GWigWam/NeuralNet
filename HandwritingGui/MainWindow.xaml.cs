@@ -43,13 +43,12 @@ namespace HandwritingGui {
 
             //Defaults
             Tb_ImgDimensions.Text = "12";
-            //Tb_ImgPath.Text = @"E:\Handwriting Data\HSF_0";
-            Tb_ImgPath.Text = @"..\..\..\HandwritingData\HSF_0";
+            Tb_ImgPath.Text = @"..\..\..\UNPACK";
             Tb_LearnRate.Text = "0.012";
             Tb_LoadBatchSize.Text = "300";
             Tb_MicroBatchSize.Text = "12";
             Tb_NetworkDimensions.Text = "144*30*10";
-            Rb_Charset_Digits.IsChecked = true;
+            Cb_Charset_Digits.IsChecked = true;
             Rb_TFunc_HyperTan.IsChecked = true;
 
             Closing += (s, a) => {
@@ -120,8 +119,9 @@ namespace HandwritingGui {
                 return;
             }
 
-            var loadNumbers = (Rb_Charset_All.IsChecked ?? false) || (Rb_Charset_Digits.IsChecked ?? false);
-            var loadChars = (Rb_Charset_All.IsChecked ?? false) || (Rb_Charset_Alphabetic.IsChecked ?? false);
+            var loadNums = Cb_Charset_Digits.IsChecked ?? false;
+            var loadLower = Cb_Charset_Lower.IsChecked ?? false;
+            var loadUpper = Cb_Charset_Upper.IsChecked ?? false;
 
             var match = new Regex(@"^(?<inp>(\d|X)+)\*(?<hid>(\d|X)+\*)+(?<out>(\d|X)+)$").Match(Tb_NetworkDimensions.Text);
             if(!match.Success) {
@@ -133,7 +133,7 @@ namespace HandwritingGui {
                 Log("Invalid network dimension: Input", Colors.Red);
                 return;
             }
-            int expectedOutputNr = Rb_Charset_Alphabetic.IsChecked.Value ? (26 * 2) : Rb_Charset_Digits.IsChecked.Value ? 10 : ((26 * 2) + 10);
+            int expectedOutputNr = (loadNums ? 10 : 0) + (loadLower ? 26 : 0) + (loadUpper ? 26 : 0);
             if(match.Groups?["out"].Value != expectedOutputNr.ToString()) {
                 Log("Invalid network dimension: Output", Colors.Red);
                 return;
@@ -162,7 +162,7 @@ namespace HandwritingGui {
 
             Log("Creating NeuralNet...");
             Task.Run(() => {
-                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray(), loadNumbers, loadChars);
+                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray(), loadNums, loadLower, loadUpper);
             }).ContinueWith((t) => {
                 Dispatcher.Invoke(() => {
                     if(t.IsCompleted) {
@@ -187,13 +187,11 @@ namespace HandwritingGui {
             Tb_NetworkDimensions.Text = new Regex(@"^[0-9,X]+(E\+\d+)?\*").Replace(Tb_NetworkDimensions.Text, replacement);
         }
 
-        private void Rb_Charset_Checked(object sender, RoutedEventArgs e) {
+        private void Charset_Checked(object sender, RoutedEventArgs e) {
             if(IsInitialized) {
-                int nr =
-                    Rb_Charset_Digits.IsChecked ?? false ? 10 :
-                    Rb_Charset_Alphabetic.IsChecked ?? false ? (26 * 2) :
-                    Rb_Charset_All.IsChecked ?? false ? ((26 * 2) + 10) :
-                        -1;
+                int nr = (Cb_Charset_Digits.IsChecked.Value ? 10 : 0) +
+                    (Cb_Charset_Lower.IsChecked.Value ? 26 : 0) +
+                    (Cb_Charset_Upper.IsChecked.Value ? 26 : 0);
 
                 Tb_NetworkDimensions.Text = new Regex(@"\*(\d+|X)$").Replace(Tb_NetworkDimensions.Text, "*" + nr);
             }

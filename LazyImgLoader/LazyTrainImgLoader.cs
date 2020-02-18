@@ -12,28 +12,16 @@ using System.Threading.Tasks;
 namespace LazyImgLoader {
     
     public class LazyTrainImgLoader {
-        private bool LoadNumbers { get; }
-        private bool LoadCharacters { get; }
+        public bool LoadNumbers { get; }
+        public bool LoadLowerChars { get; }
+        public bool LoadUpperChars { get; }
 
-        public bool CropWhitespace {
-            get;
-        }
+        public bool CropWhitespace { get; }
+        public bool HighQuality { get; }
+        public int Dimensions { get; }
+        public int BatchSize { get; }
 
-        public bool HighQuality {
-            get;
-        }
-
-        public int Dimensions {
-            get;
-        }
-
-        public int BatchSize {
-            get;
-        }
-
-        private Tuple<FileInfo, char>[] Files {
-            get;
-        }
+        private Tuple<FileInfo, char>[] Files { get; }
 
         private Task PreLoadTask;
 
@@ -43,25 +31,24 @@ namespace LazyImgLoader {
 
         private volatile int curIndex = 0;
 
-        private TransferFunction Transfer {
-            get;
-        }
+        private TransferFunction Transfer { get; }
 
         public int Index => curIndex;
         public int FileCount => Files.Length;
 
-        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool cropWhitespace, bool highQuality, int dimensions, int batchSize, bool loadNumbers, bool loadChars, bool startPreLoad = true) {
+        public LazyTrainImgLoader(string dirLoc, TransferFunction transfer, bool cropWhitespace, bool highQuality, int dimensions, int batchSize, bool nrs, bool lower, bool upper, bool startPreLoad = true) {
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
             Transfer = transfer;
-            LoadNumbers = loadNumbers;
-            LoadCharacters = loadChars;
             CropWhitespace = cropWhitespace;
             HighQuality = highQuality;
             Dimensions = dimensions;
             BatchSize = batchSize;
+            LoadNumbers = nrs;
+            LoadLowerChars = lower;
+            LoadUpperChars = upper;
 
-            var random = new Random();
-            Files = GenFileList(dirLoc)/*.OrderBy(e => random.Next())*/.ToArray();
+            InitCharNumMappings();
+            Files = GenFileList(dirLoc).ToArray();
 
             if(startPreLoad) {
                 StartPreLoad();
@@ -98,8 +85,11 @@ namespace LazyImgLoader {
 
             foreach(var file in files) {
                 string readChar = FileFormat.Match(file.Name).Groups["char"]?.Value;
-                char curChar;
-                if(char.TryParse(readChar, out curChar) && ((LoadNumbers && char.IsNumber(curChar) || (LoadCharacters && char.IsLetter(curChar))))) {
+                if(char.TryParse(readChar, out var curChar) && (
+                    (LoadNumbers && char.IsNumber(curChar)) ||
+                    (LoadLowerChars && char.IsLetter(curChar) && char.IsLower(curChar)) ||
+                    (LoadUpperChars && char.IsLetter(curChar) && char.IsUpper(curChar)))) {
+                    
                     yield return new Tuple<FileInfo, char>(file, curChar);
                 }
             }
@@ -108,8 +98,8 @@ namespace LazyImgLoader {
         private InputExpectedResult GenInOutPair(Tuple<FileInfo, char> data) {
             float[] inp = ImageReader.ReadImg(data.Item1.FullName, CropWhitespace, HighQuality, Dimensions).GreyValues(Transfer.ExtremeMin, Transfer.ExtremeMax);
 
-            var nr = charToNr(data.Item2);
-            var outp = new float[(LoadCharacters ? 52 : 0) + (LoadNumbers ? 10 : 0)];
+            var nr = CharNumMappings[data.Item2];
+            var outp = new float[(LoadNumbers ? 10 : 0) + (LoadLowerChars ? 26 : 0) + (LoadUpperChars ? 26 : 0)];
             for(int i = 0; i < outp.Length; i++) {
                 outp[i] = i == nr ? Transfer.ExtremeMax : Transfer.ExtremeMin;
             }
@@ -117,15 +107,24 @@ namespace LazyImgLoader {
             return new InputExpectedResult(inp, outp);
         }
 
-        private int charToNr(char c) {
-            var utf16 = Convert.ToInt32(c);
-            return
-                utf16 >= 97 ? utf16 - 97 + (LoadCharacters ? 0 : throw new Exception("Not supposed to load chars")) :
-                utf16 >= 65 ? utf16 - 65 + (LoadCharacters ? 26 : throw new Exception("Not supposed to load chars")) :
-                utf16 >= 48 ? utf16 - 48 + (LoadNumbers ? (LoadCharacters ? 26 + 26 : 0) : throw new Exception("Not supposed to load nrs")) :
-                    throw new Exception($"Cannot handle char '{c}'");
+        private Dictionary<char, int> CharNumMappings { get; } = new Dictionary<char, int>();
+        private void InitCharNumMappings() {
+            void add(char start, int count) {
+                for(int i = start; i < start + count; i++) {
+                    CharNumMappings[(char)i] = CharNumMappings.Count;
+                }
+            }
+            if(LoadNumbers) {
+                add('0', 10);
+            }
+            if(LoadLowerChars) {
+                add('a', 26);
+            }
+            if(LoadUpperChars) {
+                add('A', 26);
+            }
         }
-
+        
         private void StartPreLoad() {
             Loading = true;
             PreLoaded = new ConcurrentBag<InputExpectedResult>();
