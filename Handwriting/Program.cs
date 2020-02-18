@@ -1,4 +1,4 @@
-﻿using LazyImgLoader;
+﻿using ImgLoader;
 using NeuralNet;
 using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;
@@ -25,13 +25,13 @@ namespace Handwriting {
         private const int MicroBatchSize = 10;
         private const int LoadBatchSize = 300;
 
-        private const string dirLoc = "E:/Handwriting Data/HSF_0_SUB/";
+        private const string dirLoc = "../../../UNPACK";
 
         private static void Main(string[] args) {
             LogSingle("Start", false, ConsoleColor.White, ConsoleColor.Red);
-            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, ImgDimensions, LoadBatchSize, true, true);
+            var imgLoader = new LazyTrainImgLoader(dirLoc, transfer, true, true, ImgDimensions, LoadBatchSize, true, false, false);
 
-            InputExpectedResult[] validateSet = imgLoader.GetNextBatch();
+            InputExpectedResult[] validateSet = imgLoader.GetNextBatch().ToArray();
 
             LogSingle("ImageLoader read, create & train network", true);
             var network = new Network(transfer, true);
@@ -44,7 +44,7 @@ namespace Handwriting {
             InputExpectedResult[] trainData;
             int epoch = 0;
             double CurLearnRate = LearningRate;
-            while((trainData = imgLoader.GetNextBatch()).Length > 0) {
+            while((trainData = imgLoader.GetNextBatch().ToArray()).Length > 0) {
                 backpropTraining.Train(trainData.OrderBy(e => random.Next()).ToArray());
 
                 var stats = NetworkValidation.Validate(network, trainData, IsImgRecogSuccess);

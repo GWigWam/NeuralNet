@@ -107,10 +107,13 @@ namespace HandwritingGui {
                 Log("Invalid Microbatch size", Colors.Red);
                 return;
             }
+            if(microBatchsize == 1) {
+                Log("Warning: When Microbatch size is 1 backpropagation cannot be parallelized!", Colors.Yellow);
+            }
 
             int loadingBatchsize;
             if(!int.TryParse(Tb_LoadBatchSize.Text, out loadingBatchsize) || loadingBatchsize <= 0 || loadingBatchsize < microBatchsize) {
-                Log("Invalid Loadingbatch size", Colors.Red);
+                Log("Invalid Loadingbatch size (Must be > 0 and >= Microbatch size)", Colors.Red);
                 return;
             }
             var useInMem = Cb_UseInMem.IsChecked.Value;

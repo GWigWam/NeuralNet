@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNet", "NeuralNet\NeuralNet.csproj", "{F494466A-61C9-451F-9971-4CC070BC7F2C}"
 EndProject
@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HandwritingGui", "Handwriti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitmapHelpers", "BitmapHelpers\BitmapHelpers.csproj", "{FC937B33-F961-4312-BAB5-DF51DF41832E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazyImgLoader", "LazyImgLoader\LazyImgLoader.csproj", "{5E7C9331-D5C3-4211-923D-EA55CB185921}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgLoader", "LazyImgLoader\ImgLoader.csproj", "{5E7C9331-D5C3-4211-923D-EA55CB185921}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,5 +89,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2175D3EF-A271-4F46-BBD9-E8DE1CAEFAB1}
 	EndGlobalSection
 EndGlobal

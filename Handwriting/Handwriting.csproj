@@ -77,9 +77,9 @@
       <Project>{fc937b33-f961-4312-bab5-df51df41832e}</Project>
       <Name>BitmapHelpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\LazyImgLoader\LazyImgLoader.csproj">
+    <ProjectReference Include="..\LazyImgLoader\ImgLoader.csproj">
       <Project>{5e7c9331-d5c3-4211-923d-ea55cb185921}</Project>
-      <Name>LazyImgLoader</Name>
+      <Name>ImgLoader</Name>
     </ProjectReference>
     <ProjectReference Include="..\NeuralNet\NeuralNet.csproj">
       <Project>{f494466a-61c9-451f-9971-4cc070bc7f2c}</Project>
