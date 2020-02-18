@@ -46,6 +46,7 @@ namespace HandwritingGui {
             Tb_ImgPath.Text = @"..\..\..\UNPACK";
             Tb_LearnRate.Text = "0.012";
             Tb_LoadBatchSize.Text = "300";
+            Cb_UseInMem.IsChecked = true;
             Tb_MicroBatchSize.Text = "12";
             Tb_NetworkDimensions.Text = "144*30*10";
             Cb_Charset_Digits.IsChecked = true;
@@ -112,6 +113,7 @@ namespace HandwritingGui {
                 Log("Invalid Loadingbatch size", Colors.Red);
                 return;
             }
+            var useInMem = Cb_UseInMem.IsChecked.Value;
 
             string imgPath = Tb_ImgPath.Text;
             if(!Directory.Exists(imgPath)) {
@@ -162,7 +164,7 @@ namespace HandwritingGui {
 
             Log("Creating NeuralNet...");
             Task.Run(() => {
-                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray(), loadNums, loadLower, loadUpper);
+                Network.Init(imgDim, learningRate, microBatchsize, loadingBatchsize, imgPath, transFunc, inputHeight, expectedOutputNr, hiddenHeights.Select(nu => nu.Value).ToArray(), useInMem, loadNums, loadLower, loadUpper, s => Dispatcher.Invoke(() => Log(s)));
             }).ContinueWith((t) => {
                 Dispatcher.Invoke(() => {
                     if(t.IsCompleted) {

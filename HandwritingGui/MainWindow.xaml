@@ -41,7 +41,10 @@
                     <TextBox x:Name="Tb_MicroBatchSize" Grid.Column="1" Grid.Row="2" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" />
                     <!--Loadbatch size-->
                     <Label Content="Loading Batchsize:" Grid.Column="0" Grid.Row="3" />
-                    <TextBox x:Name="Tb_LoadBatchSize" Grid.Column="1" Grid.Row="3" Margin="2" PreviewTextInput="PreviewUnsignedIntTb" />
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="3" Margin="2">
+                        <TextBox x:Name="Tb_LoadBatchSize" PreviewTextInput="PreviewUnsignedIntTb" Width="150" />
+                        <CheckBox x:Name="Cb_UseInMem" Content="Load all data into memory" VerticalAlignment="Center" />
+                    </StackPanel>
                     <!--Img folder-->
                     <Label Content="Image Folder Path:" Grid.Column="0" Grid.Row="4" />
                     <Grid Grid.Column="1" Grid.Row="4">

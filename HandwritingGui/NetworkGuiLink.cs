@@ -1,5 +1,5 @@
 ﻿using HandwritingGui.PlotModels;
-using LazyImgLoader;
+using ImgLoader;
 using NeuralNet;
 using NeuralNet.BackpropagationTraining;
 using NeuralNet.TransferFunctions;
@@ -15,7 +15,7 @@ namespace HandwritingGui {
 
     internal class NetworkGuiLink : INotifyPropertyChanged, IDisposable {
 
-        public LazyTrainImgLoader ImgLoader {
+        public ImgLoader.ImgLoader ImgLoader {
             get; private set;
         }
 
@@ -58,7 +58,7 @@ namespace HandwritingGui {
 
         public int MicroBatchSize { get; set; }
 
-        public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights, bool nums, bool lower, bool upper) {
+        public void Init(int imgDim, double learnRate, int microBatchsize, int loadBatchsize, string imgFolder, TransferFunctionType funcType, int inputHeight, int outputHeight, int[] hiddenHeights, bool useInMemLoader, bool nums, bool lower, bool upper, Action<string> log) {
             switch(funcType) {
                 case TransferFunctionType.Sigmoid:
                 TransferFunc = new SigmoidFunction();
@@ -71,7 +71,16 @@ namespace HandwritingGui {
             ImageDimensions = imgDim;
             MicroBatchSize = microBatchsize;
 
-            ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize, nums, lower, upper);
+            if(useInMemLoader) {
+                ImgLoader = new InMemImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize, nums, lower, upper);
+                log("Start load into mem");
+                ((InMemImgLoader)ImgLoader).Init();
+                log("Done Loading");
+            } else {
+                log("Using lazy img loader");
+                ImgLoader = new LazyTrainImgLoader(imgFolder, TransferFunc, true, true, imgDim, loadBatchsize, nums, lower, upper);
+            }
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ImgCount"));
             InitNetwork(learnRate, inputHeight, outputHeight, hiddenHeights);
         }
@@ -119,13 +128,13 @@ namespace HandwritingGui {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsTraining"));
             while(true) {
                 if(doTrain) {
-                    var trainData = ImgLoader.GetNextBatch();
+                    var trainData = ImgLoader.GetNextBatch().ToArray();
 
                     BackpropTrain.Train(trainData, MicroBatchSize);
 
                     var stats = NetworkValidation.Validate(Network, validationData, IsImgRecogSuccess);
                     StatsOverTime.AddBoth(stats.AvgSSE, stats.SuccessPercentage);
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurImgIndex"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurImgIndex)));
 
                     if(!Train) {
                         doTrain = false;
